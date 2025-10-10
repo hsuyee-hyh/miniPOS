@@ -1,0 +1,32 @@
+# Ignore Visual Studio cache and settings
+.vs/
+.vscode/
+
+# Ignore build results
+bin/
+obj/
+Debug/
+Release/
+
+# Ignore temporary files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore environment-specific files
+*.log
+*.tmp
+*.temp
+*.db
+*.sqlite
+*.vsidx
+
+# Ignore Node.js files (if using React + ASP.NET)
+node_modules/
+dist/
+build/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
