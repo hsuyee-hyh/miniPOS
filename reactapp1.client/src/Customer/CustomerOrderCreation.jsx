@@ -119,7 +119,7 @@ export default function CustomerOrderCreation() {
   };
 
   const handleSubmit = (values) => {
-    console.log(formData);
+    // console.log(formData);
     try {
       const custForm = new FormData();
       custForm.append("Product", formData.product);

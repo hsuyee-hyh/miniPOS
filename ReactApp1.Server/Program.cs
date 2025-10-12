@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ReactApp1.Server.DataAcess;
 using ReactApp1.Server.Database;
 using ReactApp1.Server.Models;
 using ReactApp1.Server.Services;
@@ -79,10 +80,17 @@ builder.Services.AddAuthorization();
 
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+});
 // register service
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<OrderItemService>();
+builder.Services.AddScoped<OrderItemDA>();
+builder.Services.AddScoped<InvoiceService>();
+builder.Services.AddScoped<InvoiceDA>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

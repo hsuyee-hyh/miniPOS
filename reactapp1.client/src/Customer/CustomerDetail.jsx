@@ -51,7 +51,7 @@ export default function CustomerDetail() {
     const fetchOrder = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7299/api/order/orders?customerId=${customerId}`
+          `https://localhost:7299/api/order?customerId=${customerId}`
         );
         const data = await response.json();
         if (!response.ok) {
