@@ -52,5 +52,27 @@ namespace ReactApp1.Server.Controllers
                 return BadRequest(new {error = ex.Message});
             }
         }
+
+        [HttpPut("update-invoice")]
+        public async Task<IActionResult> updateInvoice([FromBody] InvoiceUpdateDto invoiceRequestDto)
+        {
+            try
+            {
+                _invoiceService.checkInvoiceUpdateData(invoiceRequestDto);
+
+                InvoiceResponseModel response = await _invoiceDA.updateInvoiceAsync(invoiceRequestDto);
+                if(response.InvoiceData is null)
+                {
+                    return NotFound(new {error = $"Invoice not found with that id: {invoiceRequestDto.Id}" });
+                }
+                return Ok(new { 
+                    success = $"Invoice data is updated successfully.",
+                    updatedInvoice = response.InvoiceData,
+                });
+            }catch(Exception ex)
+            {
+                return BadRequest(new { error = ex.Message});
+            }
+        }
     }
 }

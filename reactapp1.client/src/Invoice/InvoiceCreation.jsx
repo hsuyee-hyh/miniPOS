@@ -254,11 +254,50 @@ export default function InvoiceCreation() {
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
+
+  const handleOk = async () => {
     setIsModalOpen(false);
     console.log("Found Invoice: ", foundInvoice);
-    // call update api
+
+    try {
+      const updatedInvoiceResponse = await fetch(
+        `https://localhost:7299/api/invoice/update-invoice`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json", 
+          },
+          body: JSON.stringify({
+            id: foundInvoice.id, 
+            totalBalance: foundInvoice.totalBalance,
+            paidAmount: formData.paidAmount,
+            remainingBalance: foundInvoice.remainingBalance,
+            customerId: foundInvoice.customerId,
+          }),
+        }
+      );
+
+      const updatedInvoiceResponseData = await updatedInvoiceResponse.json();
+
+      if (!updatedInvoiceResponse.ok) {
+        setErrorMsg(
+          updatedInvoiceResponseData.error || "Failed to update invoice"
+        );
+        // message.error(
+          // updatedInvoiceResponseData.error || "Failed to update invoice"
+        // );
+        return;
+      }
+
+      message.success(
+        updatedInvoiceResponseData.success || "Invoice updated successfully!"
+      );
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      setErrorMsg(error.message);
+    }
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };

@@ -52,5 +52,37 @@ namespace ReactApp1.Server.DataAcess
             };
                 
         }
+
+        public async Task<InvoiceResponseModel> updateInvoiceAsync(InvoiceUpdateDto invoiceUpdateRequestDto)
+        {
+            // find 
+            var foundInvoice = await _context.Invoices.FirstOrDefaultAsync(
+                    x => x.Id == invoiceUpdateRequestDto.Id
+                );
+            if(foundInvoice is null)
+            {
+                return new InvoiceResponseModel
+                {
+                    InvoiceData = foundInvoice,
+                };
+            }
+
+            // update           
+            foundInvoice.TotalBalance = invoiceUpdateRequestDto.TotalBalance;
+            foundInvoice.PaidAmount = invoiceUpdateRequestDto.PaidAmount;
+            foundInvoice.RemainingBalance = invoiceUpdateRequestDto.RemainingBalance;
+            foundInvoice.CreatedDate = DateTime.UtcNow;
+            foundInvoice.CreatedBy = "Admin";
+            foundInvoice.CustomerId = invoiceUpdateRequestDto.CustomerId;
+            var result = await _context.SaveChangesAsync();
+            if(result <= 0)
+            {
+                throw new Exception("Failed to update Invoice.");
+            }
+            return new InvoiceResponseModel
+            {
+                InvoiceData = foundInvoice,
+            };
+        }
     }
 }

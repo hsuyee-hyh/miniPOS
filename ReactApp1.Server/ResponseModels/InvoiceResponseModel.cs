@@ -4,7 +4,7 @@ namespace ReactApp1.Server.ResponseModels
 {
     public class InvoiceResponseModel
     {
-        public Invoice InvoiceData { get; set; }
+        public Invoice? InvoiceData { get; set; }
 
         public bool? IsNew { get; set; }
     }
