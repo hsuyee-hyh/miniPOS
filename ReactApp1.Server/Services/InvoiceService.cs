@@ -22,7 +22,7 @@ namespace ReactApp1.Server.Services
                 {
                     throw new Exception("Total Balance cannot be null or negative");
                 }
-                else if (i.PaidAmount <= 0)
+                else if (i.PaidAmount < 0)
                 {
                     throw new Exception("Paid amount cannot be null or negative");
                 }

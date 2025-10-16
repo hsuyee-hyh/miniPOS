@@ -41,12 +41,16 @@ namespace ReactApp1.Server.Controllers
                 var foundCustomer = await _context.Customers.FirstOrDefaultAsync(x => x.Id == customerId);
                 if(foundCustomer == null)
                 {
-                    return BadRequest(new { message = "Customer not found with that CustomerId" });
+                    return BadRequest(new { error = "Customer not found with that ID" });
                 }
-                return Ok(foundCustomer);
+                return Ok(new
+                {
+                    success = "Customer is found",
+                    customer = foundCustomer,
+                });
             }catch(Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 

@@ -36,7 +36,7 @@ export default function InvoiceCreation() {
     products: [],
     balances: [],
     totalBalance: 0,
-    paidAmount: 0,
+    paidAmount: null,
     remainingBalance: 0,
   });
 
@@ -62,7 +62,7 @@ export default function InvoiceCreation() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // console.log("fetching order .....");
+        console.log("fetching order .....", customerId);
         const orderResponse = await fetch(
           `https://localhost:7299/api/order?customerId=${customerId}`
         );
@@ -251,8 +251,12 @@ export default function InvoiceCreation() {
         }
       );
       const foundOrderItemsResponseData = await foundOrderItemsResponse.json();
-      if (!foundOrderItemsResponseData.success || !foundOrderItemsResponse.ok) {
-        setErrorMsg(`Please click on 'Save to Item' firstly.`);
+      if (foundOrderItemsResponseData.error == "Order not found.") {
+        setErrorMsg("Please click on 'Save Item' firstly.");
+        return;
+      }
+      if (foundOrderItemsResponseData.error) {
+        setErrorMsg(foundOrderItemsResponseData.error);
         return;
       }
       const orderItemIds = foundOrderItemsResponseData.orderItems.map(
@@ -281,8 +285,8 @@ export default function InvoiceCreation() {
         }
       );
       const invoiceResponseData = await invoiceResponse.json();
-      if (!invoiceResponse.ok) {
-        setErrorMsg(invoiceResponseData.message);
+      if (invoiceResponseData.error) {
+        setErrorMsg(invoiceResponseData.error);
       }
       // ask user to re-create invoice
       // console.log("Invoice response data: ", invoiceResponseData);
@@ -290,7 +294,10 @@ export default function InvoiceCreation() {
         setIsModalOpen(true);
         setFoundInvoice(invoiceResponseData.foundInvoice);
         // for not memory load
-        localStorage.setItem("foundInvoice", JSON.stringify(invoiceResponseData.foundInvoice));
+        localStorage.setItem(
+          "foundInvoice",
+          JSON.stringify(invoiceResponseData.foundInvoice)
+        );
         setSuccessMsg("Invoice is created successfully.");
         return;
       }
@@ -302,7 +309,7 @@ export default function InvoiceCreation() {
 
   const handleShowSubmit = () => {
     const stored = localStorage.getItem("foundInvoice");
-    const foundInvoice = stored? JSON.parse(stored) : null;
+    const foundInvoice = stored ? JSON.parse(stored) : null;
     navigate(`/customer/${customerId}/invoice/${foundInvoice?.invoiceId}`);
   };
 
@@ -336,7 +343,7 @@ export default function InvoiceCreation() {
 
       console.log(updatedInvoiceResponseData);
       if (updatedInvoiceResponse.success) {
-        setSuccessMsg(updatedInvoiceResponseData.success);
+        setSuccessMsg("Invoice is updated successfully.");
       }
       if (updatedInvoiceResponseData.error) {
         setErrorMsg(
@@ -373,18 +380,24 @@ export default function InvoiceCreation() {
                 ) : (
                   <>
                     <div className="flex justify-end mr-20 mt-2">
-                      <Button type="primary" onClick={handleInvoiceSubmit}>
+                      <Button
+                        type="primary"
+                        onClick={handleInvoiceSubmit}
+                        className="hover:text-blue-600"
+                      >
                         Create Invoice
                       </Button>
                       <Button
+                        type="primary"
+                        onClick={handleShowSubmit}
+                        className="mr-10"
                         style={{
                           backgroundColor: "#ffffff",
                           borderColor: "#3396D3",
                           color: "#3396D3",
-                          marginLeft: "8px",
+                          marginRight: "40px",
+                          marginLeft: "10px"
                         }}
-                        type="primary"
-                        onClick={handleShowSubmit}
                       >
                         Show Invoice
                       </Button>
@@ -530,7 +543,7 @@ export default function InvoiceCreation() {
                     </Row>
                     <div className="flex justify-end mr-32 mt-2">
                       <Button type="primary" onClick={handleSubmit}>
-                        Save to Item
+                        Save Item
                       </Button>
                     </div>
                   </>

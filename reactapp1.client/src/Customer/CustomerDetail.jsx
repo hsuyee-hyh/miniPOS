@@ -27,16 +27,20 @@ export default function CustomerDetail() {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
+       
         const response = await fetch(
           `https://localhost:7299/api/customer/${customerId}`
         );
         const data = await response.json();
 
-        if (!response.ok) {
-          setErrorMsg(data.message);
+        if (data.error) {
+          setErrorMsg(data.error);
           return;
         }
-        setFoundCustomer(data);
+        if (data.success) {
+        
+          setFoundCustomer(data.customer);
+        }
       } catch (error) {
         setErrorMsg(err.message || "Failed to fetch customer detail");
       }
@@ -189,6 +193,7 @@ export default function CustomerDetail() {
       <Navbar />
       <PageContainer>
         <div className="flex flex-col items-center">
+         
           {errorMsg && (
             <Alert type="error" message={errorMsg} className="mb-4" />
           )}
@@ -260,7 +265,7 @@ export default function CustomerDetail() {
                 navigate(`/customer/${foundCustomer.id}/create-orderitem`)
               }
             >
-              Save to Item
+              Go to Item
             </Button>
           </div>
 

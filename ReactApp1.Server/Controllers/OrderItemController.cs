@@ -69,7 +69,7 @@ namespace ReactApp1.Server.Controllers
                 {
                     return NotFound(new
                     {
-                        error = "One or more orders not found."
+                        error = "Order not found."
                     });
                 }
 
