@@ -13,6 +13,9 @@ namespace ReactApp1.Server.Database.Models
         public int Id { get; set; }
 
         [Required]
+        public string InvoiceId { get; set; }
+
+        [Required]
         public decimal TotalBalance { get; set; }
 
         [Required]
@@ -29,5 +32,8 @@ namespace ReactApp1.Server.Database.Models
 
         [Required]
         public int CustomerId { get; set; }
+
+        [Required]
+        public int OrderItemId { get; set; }
     }
 }

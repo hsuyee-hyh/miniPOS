@@ -4,7 +4,7 @@ namespace ReactApp1.Server.Services
 {
     public class InvoiceService
     {
-        public void checkInvoiceData(InvoiceDto invoiceRequestDto)
+        public void checkInvoiceData(List<InvoiceDto> invoiceRequestDto)
         {
             if(invoiceRequestDto is null)
             {
@@ -12,19 +12,30 @@ namespace ReactApp1.Server.Services
             }
 
            
-            if(invoiceRequestDto.TotalBalance <= 0 )
+            foreach(var i in invoiceRequestDto)
             {
-                throw new Exception("Total Balance cannot be null or negative");
-            }else if(invoiceRequestDto.PaidAmount <= 0)
-            {
-                throw new Exception("Paid amount cannot be null or negative");
-            }else if (invoiceRequestDto.RemainingBalance <= 0)
-            {
-                throw new Exception("Remaining Balance cannot be null or negative");
-            }else if(invoiceRequestDto.CustomerId <= 0)
-            {
-                throw new Exception("CustomerId cannot be null or negative");
+                if(i.InvoiceId is null)
+                {
+                    throw new Exception("Invoice Id cannot be null.");
+                }
+                else if (i.TotalBalance <= 0)
+                {
+                    throw new Exception("Total Balance cannot be null or negative");
+                }
+                else if (i.PaidAmount <= 0)
+                {
+                    throw new Exception("Paid amount cannot be null or negative");
+                }
+                else if (i.RemainingBalance < 0)
+                {
+                    throw new Exception("Remaining Balance cannot be null or negative");
+                }
+                else if (i.CustomerId <= 0)
+                {
+                    throw new Exception("CustomerId cannot be null or negative");
+                }
             }
+            
         }
 
         public void checkInvoiceUpdateData(InvoiceUpdateDto invoiceUpdateRequestDto)
@@ -46,7 +57,7 @@ namespace ReactApp1.Server.Services
             {
                 throw new Exception("Paid amount for update cannot be null or negative");
             }
-            else if (invoiceUpdateRequestDto.RemainingBalance <= 0)
+            else if (invoiceUpdateRequestDto.RemainingBalance < 0)
             {
                 throw new Exception("Remaining Balance for update cannot be null or negative");
             }

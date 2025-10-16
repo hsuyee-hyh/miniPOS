@@ -6,6 +6,10 @@ namespace ReactApp1.Server.RequestModels
     {
 
         public int? Id { get; set; }
+
+        [Required]
+        public string InvoiceId { get; set; }
+
         [Required]
         public decimal TotalBalance { get; set; }
 

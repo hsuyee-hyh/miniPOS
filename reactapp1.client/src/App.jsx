@@ -41,7 +41,8 @@ function App() {
           <Route path="/customer/:customerId/create-order" element={<CustomerOrderCreation/>} />
           <Route path="/customer/:customerId/order/:orderId" element={<CustomerOrderEdit/>} />
 
-          <Route path="/customer/:customerId/create-invoice" element={<InvoiceCreation/>} />
+          <Route path="/customer/:customerId/create-orderitem" element={<InvoiceCreation/>} />
+          <Route path="/customer/:customerId/invoice/:invoiceId" element= {<ShowInvoice/>} />
         </Routes>
       </div>
     </>

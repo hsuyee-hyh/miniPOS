@@ -49,5 +49,13 @@ namespace ReactApp1.Server.Services
                
             }
         }
+
+        public void checkOrderIdList(List<int> orderIds)
+        {
+            if(orderIds is null || orderIds.Count < 1)
+            {
+                throw new Exception("OrderIds list cannot be null or empty.");
+            }
+        }
     }
 }

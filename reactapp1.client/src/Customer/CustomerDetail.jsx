@@ -257,10 +257,10 @@ export default function CustomerDetail() {
             <Button
               style={{ backgroundColor: "#ffffff", borderColor: "#3396D3" }}
               onClick={() =>
-                navigate(`/customer/${foundCustomer.id}/create-invoice`)
+                navigate(`/customer/${foundCustomer.id}/create-orderitem`)
               }
             >
-              Create Invoice
+              Save to Item
             </Button>
           </div>
 

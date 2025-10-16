@@ -4,6 +4,8 @@ namespace ReactApp1.Server.RequestModels
 {
     public class InvoiceDto
     {
+        [Required]
+        public string InvoiceId { get; set; }
 
         [Required]
         public decimal TotalBalance { get; set; }
@@ -16,5 +18,8 @@ namespace ReactApp1.Server.RequestModels
 
         [Required]
         public int CustomerId { get; set; }
+
+        [Required]
+        public int OrderItemId { get; set; }
     }
 }

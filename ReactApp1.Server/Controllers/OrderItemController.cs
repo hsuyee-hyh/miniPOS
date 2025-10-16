@@ -25,6 +25,68 @@ namespace ReactApp1.Server.Controllers
             _orderItemDA = orderItemDA;
         }
 
+        [HttpGet("list")]
+        public async Task<IActionResult> GetOrderItems([FromQuery] List<int> id)
+        {
+            try
+            {
+                if (id is null || id.Count == 0)
+                {
+                    throw new Exception("Id cannot be null or zero.");
+                }
+                var orderItemList = await _orderItemDA.getOrderItemsAsync(id);
+                if(orderItemList is null || orderItemList.Count == 0)
+                {
+                    return NotFound(new
+                    {
+                        error = "Order Items are not found"
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = "Order Items are found",
+                    orderItemList = orderItemList
+                });
+            }catch(Exception ex)
+            {
+                return BadRequest(new
+                {
+                    error = ex.Message,
+                });
+            }
+        }
+
+        [HttpPost("orderids")]
+        public async Task<IActionResult> searchOrderItemsByOrderIds([FromBody] List<int> orderIds)
+        {
+            try
+            {
+                _orderItemService.checkOrderIdList(orderIds);
+                List<OrderItem> orderItemList = await _orderItemDA.searchOrderItemsByOrderIdsAsync(orderIds);
+
+                if(orderItemList is null || orderItemList.Count == 0)
+                {
+                    return NotFound(new
+                    {
+                        error = "One or more orders not found."
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = $"One or more order items are found.",
+                    orderItems = orderItemList,
+                });
+            }catch(Exception ex)
+            {
+                return BadRequest(new
+                {
+                    error = $"Error occured while getting orderItems: {ex.Message}",
+                });
+            }
+        }
+
 
         [HttpPost("create-orderitem")]
         public async Task<IActionResult> createOrderItem([FromBody] List<OrderItemDto> orderItemDtoRequest)
