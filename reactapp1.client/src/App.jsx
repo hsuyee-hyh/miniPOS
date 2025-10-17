@@ -17,6 +17,7 @@ import CustomerOrderCreation from "./Customer/CustomerOrderCreation";
 import CustomerOrderEdit from "./Customer/CustomerOrderEdit";
 import ShowInvoice from "./Invoice/ShowInvoice";
 import InvoiceCreation from "./Invoice/InvoiceCreation";
+import CustomerEdit from "./Customer/CustomerEdit";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/customer" element={<CustomerList />} />
           <Route path="/customer/create" element={<CustomerCreation />} />
           <Route path="/customer/:customerId" element={<CustomerDetail />} />
+          <Route path="/customer/edit/:customerId" element={<CustomerEdit/>} />
           
           <Route path="/customer/:customerId/create-order" element={<CustomerOrderCreation/>} />
           <Route path="/customer/:customerId/order/:orderId" element={<CustomerOrderEdit/>} />
