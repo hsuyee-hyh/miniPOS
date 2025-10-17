@@ -27,7 +27,6 @@ export default function CustomerDetail() {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-       
         const response = await fetch(
           `https://localhost:7299/api/customer/${customerId}`
         );
@@ -38,7 +37,6 @@ export default function CustomerDetail() {
           return;
         }
         if (data.success) {
-        
           setFoundCustomer(data.customer);
         }
       } catch (error) {
@@ -168,7 +166,7 @@ export default function CustomerDetail() {
   const handleOk = async () => {
     try {
       const response = await fetch(
-        `https://localhost:7299/api/customer/delete/${customerId}`,
+        `https://localhost:7299/api/customer/delete/${customerId}/detail`,
         {
           method: "DELETE",
         }
@@ -193,7 +191,6 @@ export default function CustomerDetail() {
       <Navbar />
       <PageContainer>
         <div className="flex flex-col items-center">
-         
           {errorMsg && (
             <Alert type="error" message={errorMsg} className="mb-4" />
           )}
@@ -214,7 +211,7 @@ export default function CustomerDetail() {
             </Button>
 
             <Modal
-              title="Are you sure to delete?"
+              title="Are you sure to delete detail infos related to that Customer?"
               closable={{ "aria-label": "Custom Close Button" }}
               open={isModalOpen}
               onOk={handleOk}

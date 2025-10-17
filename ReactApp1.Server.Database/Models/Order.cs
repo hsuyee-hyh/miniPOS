@@ -29,8 +29,13 @@ namespace ReactApp1.Server.Database.Models
         [Required]
         public int Quantity { get; set; }
 
+        // customer FK
         [Required]
         public int CustomerId { get; set; }
+
+        // for fk
+        public Customer Customer { get; set; }
+        public OrderItem OrderItem { get; set; }
 
     }
 }

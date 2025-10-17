@@ -187,7 +187,7 @@ export default function ShowInvoice() {
         </div>
         ${contentClone.innerHTML}
 
-        <div style="text-align: center; margin-top: 10px;">Thank you for your paid.</div>
+        <div style="text-align: center; margin-top: 10px;">Thank you for your purchase.</div>
         
         <script>
           window.onload = function() {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ReactApp1.Server.DataAcess;
 using ReactApp1.Server.Database;
 using ReactApp1.Server.Database.Models;
 using ReactApp1.Server.Services;
@@ -14,11 +15,13 @@ namespace ReactApp1.Server.Controllers
     {
         private readonly AppDbContext _context;
         private readonly CustomerService _customerService;
+        private readonly CustomerDA _customerDA;
 
-        public CustomerController(AppDbContext context, CustomerService customerService)
+        public CustomerController(AppDbContext context, CustomerService customerService, CustomerDA customerDA)
         {
             _context = context;
             _customerService = customerService;
+            _customerDA = customerDA;
         }
 
         [HttpGet("customers")]
@@ -168,7 +171,30 @@ namespace ReactApp1.Server.Controllers
 
         }
 
+        [HttpDelete("delete/{customerId}/detail")]
+        public IActionResult DeleteCustomerDetail(int customerId)
+        {
+            if(customerId== null || customerId <= 0)
+            {
+                return BadRequest(new
+                {
+                    error = "customerId cannot be null or zero"
+                });
+            }
 
+            var result = _customerDA.deleteCustomerDetail(customerId);
+            if(result <=0)
+            {
+                return BadRequest(new
+                {
+                    error = "Customer detail Infos are not deleted."
+                });
+            }
+            return Ok(new
+            {
+                success = "Customer Detail Infos are deleted successfully."
+            });
+        }
         
     }
 }

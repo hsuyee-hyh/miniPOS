@@ -86,6 +86,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 // register service
 builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<CustomerDA>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<OrderItemService>();
 builder.Services.AddScoped<OrderItemDA>();
