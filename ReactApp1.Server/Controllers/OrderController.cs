@@ -22,7 +22,7 @@ namespace ReactApp1.Server.Controllers
         }
 
         // get order by customerId
-        [HttpGet("orders")]
+        [HttpGet]
         public async Task<IActionResult> GetOrders([FromQuery] string customerId)
         {
             int id = int.Parse(customerId);

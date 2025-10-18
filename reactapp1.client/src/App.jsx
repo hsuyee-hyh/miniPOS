@@ -16,6 +16,7 @@ import CustomerDetail from "./Customer/CustomerDetail";
 import CustomerOrderCreation from "./Customer/CustomerOrderCreation";
 import CustomerOrderEdit from "./Customer/CustomerOrderEdit";
 import ShowInvoice from "./Invoice/ShowInvoice";
+import InvoiceCreation from "./Invoice/InvoiceCreation";
 
 function App() {
   return (
@@ -40,7 +41,7 @@ function App() {
           <Route path="/customer/:customerId/create-order" element={<CustomerOrderCreation/>} />
           <Route path="/customer/:customerId/order/:orderId" element={<CustomerOrderEdit/>} />
 
-          <Route path="/customer/:customerId/create-invoice" element={<ShowInvoice/>} />
+          <Route path="/customer/:customerId/create-invoice" element={<InvoiceCreation/>} />
         </Routes>
       </div>
     </>

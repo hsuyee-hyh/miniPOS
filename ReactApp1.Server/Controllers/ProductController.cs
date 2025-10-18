@@ -78,8 +78,8 @@ namespace ReactApp1.Server.Controllers
         }
 
 
-        [HttpGet("{productId}")]
-        public async Task<IActionResult> GetProductById(int productId)
+        [HttpGet]
+        public async Task<IActionResult> GetProductById([FromQuery] int productId)
         {
             if (productId <= 0)
             {
