@@ -29,9 +29,15 @@ namespace ReactApp1.Server.Database.Models
         [Required]
         public int Quantity { get; set; }
 
-        // customer FK
+        [Required]
+        public DateTimeOffset CreatedDate { get; set; }
+        [Required]
+        public string CreatedBy { get; set; }
         [Required]
         public int CustomerId { get; set; }
+
+        [Required]
+        public bool IsGeneratedInvoice { get; set; }
 
         // for fk
         public Customer Customer { get; set; }

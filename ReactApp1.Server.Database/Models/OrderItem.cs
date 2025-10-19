@@ -34,10 +34,20 @@ namespace ReactApp1.Server.Database.Models
         [Required]
         public int CustomerId { get; set; }
 
+        [Required]
+        public DateTimeOffset CreatedDate { get; set; }
+        [Required]
+        public string CreatedBy { get; set; }
+
+        [Required]
+        public bool IsGeneratedInvoice { get; set; }
+
         // fk
         [ForeignKey(nameof(OrderId))]
         public Order Order { get; set; }
 
         public Invoice Invoice { get; set; }
+
+
     }
 }

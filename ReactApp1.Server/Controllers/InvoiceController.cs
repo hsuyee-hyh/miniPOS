@@ -21,6 +21,32 @@ namespace ReactApp1.Server.Controllers
             _invoiceDA = invoiceDA;
         }
 
+        //invoice list including Customerinfo
+        [HttpGet("list")]
+        public async Task<IActionResult> GetInvoiceList()
+        {
+            try
+            {
+                var invoiceList =await _invoiceDA.getInvoiceListAsync();
+                if(invoiceList is null || invoiceList.Count <= 0)
+                {
+                    return NotFound(new
+                    {
+                        error = "Invoice list not found."
+                    });
+                }
+                return Ok(new
+                {
+                    success = "Invoice lists are found",
+                    invoiceList = invoiceList
+                });
+            }catch(Exception ex)
+            {
+                return BadRequest(new {error = ex.Message});
+            }
+        }
+
+
         [HttpGet("{invoiceId}")]
         public async Task<IActionResult> getInvoiceByInvoiceId (string invoiceId)
         {

@@ -56,6 +56,9 @@ namespace ReactApp1.Server.DataAcess
                     Quantity = dto.Quantity,
                     Balance = dto.Balance,
                     CustomerId = dto.CustomerId,
+                    CreatedDate = DateTimeOffset.Now,
+                    CreatedBy = "Admin",
+                    IsGeneratedInvoice = false,
                 };
 
                 await _context.OrderItems.AddAsync(orderItem);

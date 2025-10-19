@@ -77,7 +77,7 @@ export default function CustomerList() {
       <Navbar />
       <PageContainer>
         <div className=" px-20">
-          <h1 className="text-xl font-bold mb-4">Product List</h1>
+          <h1 className="text-xl font-bold mb-4">Customer List</h1>
           <Table dataSource={customers} columns={columns} rowKey="customerId"/>
         </div>
       </PageContainer>

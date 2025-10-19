@@ -41,6 +41,29 @@ namespace ReactApp1.Server.Controllers
             return Ok(orders);
         }
 
+        // get order by customerId
+        [HttpGet("customer/{customerId}")]
+        public async Task<IActionResult> GetInvoicedOrders(string customerId)
+        {
+            int id = int.Parse(customerId);
+            _orderService.GetOrder(id);
+
+            List<Order> orders = await _context.Orders
+                .Where(x => x.CustomerId == id && x.IsGeneratedInvoice== false)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+            if (orders.Count == 0)
+            {
+                return NotFound(new
+                {
+                    error = "Orders cannot be found",
+                });
+            }
+
+            return Ok(orders);
+        }
+
         [HttpPost("create-order")]
         public async Task<IActionResult> CreateOrderAsync( [FromForm] OrderDto requestOrder)
         {
@@ -56,6 +79,9 @@ namespace ReactApp1.Server.Controllers
                 VehicleCost = requestOrder.VehicleCost,
                 TotalSellingCost = requestOrder.TotalSellingCost,
                 Quantity = requestOrder.Quantity,
+                CreatedDate = DateTimeOffset.Now,
+                CreatedBy = "Admin",
+                IsGeneratedInvoice = false,
 
                 CustomerId = requestOrder.CustomerId,
             };
@@ -116,6 +142,7 @@ namespace ReactApp1.Server.Controllers
                 foundOrder.TotalSellingCost = requestOrder.TotalSellingCost;
                 foundOrder.Quantity = requestOrder.Quantity;
                 foundOrder.CustomerId = requestOrder.CustomerId;
+                foundOrder.CreatedDate = DateTime.UtcNow;
 
                 var result = await _context.SaveChangesAsync();
                 if(result < 1)

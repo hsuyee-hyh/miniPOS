@@ -230,7 +230,7 @@ export default function ShowInvoice() {
         </div>
 
         <div className="flex-col items-center justify-center" ref={invoiceRef}>
-          <div className="flex justify-between sm:px-0 sm:mx-0 md:px-38 md:mx-10">
+          <div className="flex justify-between sm:px-0 sm:mx-0 md:px-46 md:mx-10">
             <div className="flex flex-col ">
               {customer && (
                 <div className="flex flex-col mt-4">

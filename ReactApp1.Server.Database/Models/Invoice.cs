@@ -26,7 +26,7 @@ namespace ReactApp1.Server.Database.Models
         public decimal RemainingBalance { get; set; }
 
         [Required]
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
         [Required]
         public string CreatedBy { get; set; }
@@ -39,5 +39,8 @@ namespace ReactApp1.Server.Database.Models
 
         [ForeignKey(nameof(OrderItemId))]
         public OrderItem OrderItem { get; set; }
+
+        [ForeignKey(nameof(CustomerId))]
+        public Customer Customer { get; set; }
     }
 }

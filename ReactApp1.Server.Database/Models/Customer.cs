@@ -25,8 +25,10 @@ namespace ReactApp1.Server.Database.Models
         public string CustomerAddress { get; set; }
 
 
-        // orders
+        // fk
         public ICollection<Order> Orders { get; set; } = new List<Order>();
+
+        public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
     }
 }
