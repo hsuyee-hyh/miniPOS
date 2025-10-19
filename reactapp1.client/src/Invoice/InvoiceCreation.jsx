@@ -15,6 +15,7 @@ import {
   Modal,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
+import { v4 } from "uuid";
 
 export default function InvoiceCreation() {
   const { customerId } = useParams();
@@ -24,6 +25,7 @@ export default function InvoiceCreation() {
   const [balance, setBalance] = useState([]);
   const [paidAmountRequired, setPaidAmountRequired] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [foundInvoice, setFoundInvoice] = useState(null);
 
@@ -34,7 +36,7 @@ export default function InvoiceCreation() {
     products: [],
     balances: [],
     totalBalance: 0,
-    paidAmount: 0,
+    paidAmount: null,
     remainingBalance: 0,
   });
 
@@ -43,16 +45,24 @@ export default function InvoiceCreation() {
     if (errorMsg) {
       const timer = setTimeout(() => {
         setErrorMsg(null);
-      }, 3000);
-      clearTimeout(timer);
+      }, 5000);
+      return () => clearTimeout(timer);
     }
-  }, [errorMsg]);
+
+    if (successMsg) {
+      const timer = setTimeout(() => {
+        setSuccessMsg(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errorMsg, successMsg]);
 
   // fetch order data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // console.log("fetching order .....");
+        console.log("fetching order .....", customerId);
         const orderResponse = await fetch(
           `https://localhost:7299/api/order?customerId=${customerId}`
         );
@@ -172,7 +182,7 @@ export default function InvoiceCreation() {
         quantity: formData.orders.map((o) => o.quantity),
         balance: formData.balances,
         customerId: formData.customerId,
-        totalBalance: formData.balances,
+        totalBalance: formData.totalBalance,
         paidAmount: formData.paidAmount,
         remainingBalance: formData.remainingBalance,
       };
@@ -211,15 +221,59 @@ export default function InvoiceCreation() {
         }
       );
 
-      // ✅ handle API response
+      //  handle API response
       const result = await response.json();
 
       if (!response.ok) {
-        // message.error(result.error || "Failed to create order item.");
         setErrorMsg(result.error || "Failed to create order item.");
+      } else {
+        setSuccessMsg("Order item is created successfully.");
       }
+    } catch (err) {
+      console.error("Error:", err);
+      setErrorMsg(err.message);
+    }
+  };
 
-      // insert Invoice
+  const handleInvoiceSubmit = async () => {
+    try {
+      const orderIds = formData.orders.map((o) => o.id);
+      const invoiceId = v4();
+
+      const foundOrderItemsResponse = await fetch(
+        `https://localhost:7299/api/orderitem/orderids`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orderIds),
+        }
+      );
+      const foundOrderItemsResponseData = await foundOrderItemsResponse.json();
+      if (foundOrderItemsResponseData.error == "Order not found.") {
+        setErrorMsg("Please click on 'Save Item' firstly.");
+        return;
+      }
+      if (foundOrderItemsResponseData.error) {
+        setErrorMsg(foundOrderItemsResponseData.error);
+        return;
+      }
+      const orderItemIds = foundOrderItemsResponseData.orderItems.map(
+        (oi) => oi.id
+      );
+
+      // create invoice
+      // list of invoice which have orderItem
+      const invoiceBodyData = orderItemIds.map((id) => ({
+        invoiceId: invoiceId,
+        totalBalance: Number(formData.totalBalance),
+        paidAmount: Number(formData.paidAmount),
+        remainingBalance: Number(formData.remainingBalance),
+        customerId: Number(customerId),
+        orderItemId: Number(id),
+      }));
+      // console.log("InvoiceBodyData: ", invoiceBodyData)
       const invoiceResponse = await fetch(
         `https://localhost:7299/api/invoice/create-invoice`,
         {
@@ -227,38 +281,82 @@ export default function InvoiceCreation() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(invoiceData),
+          body: JSON.stringify(invoiceBodyData),
         }
       );
       const invoiceResponseData = await invoiceResponse.json();
-      if (!invoiceResponse.ok) {
-        setErrorMsg(invoiceResponseData.message);
+      if (invoiceResponseData.error) {
+        setErrorMsg(invoiceResponseData.error);
       }
       // ask user to re-create invoice
-      console.log("Invoice response data: ", invoiceResponseData);
+      // console.log("Invoice response data: ", invoiceResponseData);
       if (invoiceResponseData.isNew == false) {
         setIsModalOpen(true);
         setFoundInvoice(invoiceResponseData.foundInvoice);
+        // for not memory load
+        localStorage.setItem(
+          "foundInvoice",
+          JSON.stringify(invoiceResponseData.foundInvoice)
+        );
+        setSuccessMsg("Invoice is created successfully.");
         return;
       }
-
-      // post invoice
-
-      message.success("Order items created successfully!");
     } catch (err) {
-      console.error("Error:", err);
+      console.log("Error occured while creating invoice: ", err);
       setErrorMsg(err.message);
     }
+  };
+
+  const handleShowSubmit = () => {
+    const stored = localStorage.getItem("foundInvoice");
+    const foundInvoice = stored ? JSON.parse(stored) : null;
+    navigate(`/customer/${customerId}/invoice/${foundInvoice?.invoiceId}`);
   };
 
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
+
+  const handleOk = async () => {
     setIsModalOpen(false);
-    console.log("Found Invoice: ", foundInvoice);
-    // call update api
+    // console.log("Found Invoice: ", foundInvoice);
+
+    try {
+      const updatedInvoiceResponse = await fetch(
+        `https://localhost:7299/api/invoice/update-invoice`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            invoiceId: foundInvoice.invoiceId,
+            totalBalance: foundInvoice.totalBalance,
+            paidAmount: formData.paidAmount,
+            remainingBalance: formData.remainingBalance,
+            customerId: foundInvoice.customerId,
+          }),
+        }
+      );
+
+      const updatedInvoiceResponseData = await updatedInvoiceResponse.json();
+
+      console.log(updatedInvoiceResponseData);
+      if (updatedInvoiceResponse.success) {
+        setSuccessMsg("Invoice is updated successfully.");
+      }
+      if (updatedInvoiceResponseData.error) {
+        setErrorMsg(
+          updatedInvoiceResponseData.error || "Failed to update invoice"
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      setErrorMsg(error.message);
+    }
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -268,6 +366,7 @@ export default function InvoiceCreation() {
       <Navbar />
       <div className="p-6">
         {errorMsg && <Alert message={errorMsg} type="error" showIcon />}
+        {successMsg && <Alert message={successMsg} type="success" showIcon />}
         <div className="flex flex-col items-center mt-4">
           <Card variant="outlined" className="w-[500px] md:w-[800px]">
             <Form form={form}>
@@ -280,8 +379,31 @@ export default function InvoiceCreation() {
                   </div>
                 ) : (
                   <>
+                    <div className="flex justify-end mr-20 mt-2">
+                      <Button
+                        type="primary"
+                        onClick={handleInvoiceSubmit}
+                        className="hover:text-blue-600"
+                      >
+                        Create Invoice
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={handleShowSubmit}
+                        className="mr-10"
+                        style={{
+                          backgroundColor: "#ffffff",
+                          borderColor: "#3396D3",
+                          color: "#3396D3",
+                          marginRight: "40px",
+                          marginLeft: "10px"
+                        }}
+                      >
+                        Show Invoice
+                      </Button>
+                    </div>
                     {/* order */}
-                    <div>
+                    <div className="mt-4">
                       <Row type="flex">
                         <Col span={4} className="font-bold">
                           OrderId
@@ -421,7 +543,7 @@ export default function InvoiceCreation() {
                     </Row>
                     <div className="flex justify-end mr-32 mt-2">
                       <Button type="primary" onClick={handleSubmit}>
-                        Save Change
+                        Save Item
                       </Button>
                     </div>
                   </>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReactApp1.Server.Database;
 
@@ -11,9 +12,11 @@ using ReactApp1.Server.Database;
 namespace ReactApp1.Server.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251017144057_AddCascadeForeignKey")]
+    partial class AddCascadeForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +79,7 @@ namespace ReactApp1.Server.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("OrderItemId")
+                    b.Property<int>("OrderItemId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("PaidAmount")
@@ -91,8 +94,7 @@ namespace ReactApp1.Server.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrderItemId")
-                        .IsUnique()
-                        .HasFilter("[OrderItemId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Invoices");
                 });
@@ -261,7 +263,8 @@ namespace ReactApp1.Server.Database.Migrations
                     b.HasOne("ReactApp1.Server.Database.Models.OrderItem", "OrderItem")
                         .WithOne("Invoice")
                         .HasForeignKey("ReactApp1.Server.Database.Models.Invoice", "OrderItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("OrderItem");
                 });

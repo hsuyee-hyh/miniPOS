@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReactApp1.Server.Database;
 
@@ -11,9 +12,11 @@ using ReactApp1.Server.Database;
 namespace ReactApp1.Server.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251014164736_AddOrderItemIdtoInvoiceTable")]
+    partial class AddOrderItemIdtoInvoiceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,11 +75,7 @@ namespace ReactApp1.Server.Database.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("InvoiceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OrderItemId")
+                    b.Property<int>("OrderItemId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("PaidAmount")
@@ -89,10 +88,6 @@ namespace ReactApp1.Server.Database.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderItemId")
-                        .IsUnique()
-                        .HasFilter("[OrderItemId] IS NOT NULL");
 
                     b.ToTable("Invoices");
                 });
@@ -135,8 +130,6 @@ namespace ReactApp1.Server.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.ToTable("Orders");
                 });
 
@@ -171,9 +164,6 @@ namespace ReactApp1.Server.Database.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
 
                     b.ToTable("OrderItems");
                 });
@@ -254,55 +244,6 @@ namespace ReactApp1.Server.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("ReactApp1.Server.Database.Models.Invoice", b =>
-                {
-                    b.HasOne("ReactApp1.Server.Database.Models.OrderItem", "OrderItem")
-                        .WithOne("Invoice")
-                        .HasForeignKey("ReactApp1.Server.Database.Models.Invoice", "OrderItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("OrderItem");
-                });
-
-            modelBuilder.Entity("ReactApp1.Server.Database.Models.Order", b =>
-                {
-                    b.HasOne("ReactApp1.Server.Database.Models.Customer", "Customer")
-                        .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("ReactApp1.Server.Database.Models.OrderItem", b =>
-                {
-                    b.HasOne("ReactApp1.Server.Database.Models.Order", "Order")
-                        .WithOne("OrderItem")
-                        .HasForeignKey("ReactApp1.Server.Database.Models.OrderItem", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("ReactApp1.Server.Database.Models.Customer", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("ReactApp1.Server.Database.Models.Order", b =>
-                {
-                    b.Navigation("OrderItem")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ReactApp1.Server.Database.Models.OrderItem", b =>
-                {
-                    b.Navigation("Invoice")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

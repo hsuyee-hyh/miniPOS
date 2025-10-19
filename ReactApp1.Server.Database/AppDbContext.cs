@@ -39,6 +39,27 @@ namespace ReactApp1.Server.Database
                 .HasIndex(u => u.CustomerCode)
                 .IsUnique();
 
+            // Customer -> Orders
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Customer)
+                .WithMany(c => c.Orders)
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // one order -> one OrderItem
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.OrderItem)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey<OrderItem>(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // one invoice -> one OrderItem
+            // invoice will not delete after deleting OrderItem
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.OrderItem)
+                .WithOne(oi => oi.Invoice)
+                .HasForeignKey<Invoice>(i => i.OrderItemId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
