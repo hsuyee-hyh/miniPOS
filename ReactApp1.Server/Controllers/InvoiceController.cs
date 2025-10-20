@@ -77,6 +77,45 @@ namespace ReactApp1.Server.Controllers
             }
         }
 
+        [HttpGet("{invoiceId}/customer/{customerId}")]
+        public async Task<IActionResult> getInvoiceByCustomerId (string invoiceId, string customerId)
+        {
+            try
+            {
+                string invId = _invoiceService.checkInvoiceId(invoiceId);
+                int cusId = _invoiceService.checkCustomerId(customerId);
+
+                // find all invoices that its paid amount is not zero
+                InvoiceResponseModel result = await _invoiceDA.getInvoiceByCustomerIdAsync(invId, cusId); 
+                
+                if(result.CreatedInvoiceDataList is null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Created Invoice is not found."
+                    });
+                }
+                if(result.InvoiceDataList?.Count <= 0) {
+                    return Ok(new
+                    {
+                        error = "There isn't any Left Balance."
+                    });
+                }
+                return Ok(new
+                {
+                    success = "These are invoices with Left Balance",
+                    createdInvoiceList = result.CreatedInvoiceDataList,
+                    invoiceList = result.InvoiceDataList,
+                });
+            }catch(Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = ex.Message,
+                });
+            }
+        }
+
 
         [HttpPost("create-invoice")]
         public async Task<IActionResult> createInvoice([FromBody] List<InvoiceDto> invoiceRequestDto)

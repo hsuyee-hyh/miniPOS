@@ -45,6 +45,33 @@ namespace ReactApp1.Server.DataAcess
                 InvoiceDataList = invoices,
             };
         }
+
+
+        public async Task<InvoiceResponseModel> getInvoiceByCustomerIdAsync (string invoiceId, int customerId)
+        {
+            // find Invoice
+            var createdInvoiceList = await _context.Invoices
+                .Where(x => x.InvoiceId == invoiceId)
+                .ToListAsync();
+
+                
+            // find invoices that its paid amount is not zero
+            var invoices = await _context.Invoices
+                .Where(x => x.CustomerId == customerId && x.RemainingBalance != 0)
+                .ToListAsync();
+           
+            // add to list
+            //List<Invoice> invoiceList = new List<Invoice>();
+            //invoices.ForEach(inv =>
+            //{
+            //    invoiceList.Add(new Invoice { InvoiceId = inv.InvoiceId, PaidAmount = inv.PaidAmount });
+            //});
+
+            return new InvoiceResponseModel {
+                CreatedInvoiceDataList = createdInvoiceList,
+                InvoiceDataList = invoices,
+            };
+        }
         public async Task<InvoiceResponseModel> createInvoiceAsync(List<InvoiceDto> invoiceRequestDto)
         {
             // find invoice
