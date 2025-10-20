@@ -32,11 +32,13 @@ export default function CustomerDetail() {
         );
         const data = await response.json();
 
-        if (!response.ok) {
-          setErrorMsg(data.message);
+        if (data.error) {
+          setErrorMsg(data.error);
           return;
         }
-        setFoundCustomer(data);
+        if (data.success) {
+          setFoundCustomer(data.customer);
+        }
       } catch (error) {
         setErrorMsg(err.message || "Failed to fetch customer detail");
       }
@@ -164,7 +166,7 @@ export default function CustomerDetail() {
   const handleOk = async () => {
     try {
       const response = await fetch(
-        `https://localhost:7299/api/customer/delete/${customerId}`,
+        `https://localhost:7299/api/customer/delete/${customerId}/detail`,
         {
           method: "DELETE",
         }
@@ -209,7 +211,7 @@ export default function CustomerDetail() {
             </Button>
 
             <Modal
-              title="Are you sure to delete?"
+              title="Are you sure to delete detail infos related to that Customer?"
               closable={{ "aria-label": "Custom Close Button" }}
               open={isModalOpen}
               onOk={handleOk}
@@ -257,10 +259,10 @@ export default function CustomerDetail() {
             <Button
               style={{ backgroundColor: "#ffffff", borderColor: "#3396D3" }}
               onClick={() =>
-                navigate(`/customer/${foundCustomer.id}/create-invoice`)
+                navigate(`/customer/${foundCustomer.id}/create-orderitem`)
               }
             >
-              Create Invoice
+              Go to Item
             </Button>
           </div>
 

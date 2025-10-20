@@ -2,8 +2,11 @@
 
 namespace ReactApp1.Server.RequestModels
 {
-    public class InvoiceDto
+    public class InvoiceUpdateDto
     {
+
+        public int? Id { get; set; }
+
         [Required]
         public string InvoiceId { get; set; }
 
@@ -18,8 +21,5 @@ namespace ReactApp1.Server.RequestModels
 
         [Required]
         public int CustomerId { get; set; }
-
-        [Required]
-        public int OrderItemId { get; set; }
     }
 }

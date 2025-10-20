@@ -15,6 +15,23 @@ namespace ReactApp1.Server.DataAcess
             _context = context;
         }
 
+        public async Task<List<OrderItem>> getOrderItemsAsync(List<int> id)
+        {
+            var orderItemList = await _context.OrderItems
+                .Where(x => id.Contains(x.Id))
+                .ToListAsync();
+            return orderItemList;
+        }
+
+        // read
+        public async Task<List<OrderItem>> searchOrderItemsByOrderIdsAsync(List<int> orderIds)
+        {
+            List<OrderItem> orderItems = await _context.OrderItems
+                .Where(x => orderIds.Contains(x.OrderId))
+                .ToListAsync();
+            return orderItems;
+        }
+
         // create
         public async Task<int> createOrderItemAsync(List<OrderItemDto> orderItemDtoRequest)
         {

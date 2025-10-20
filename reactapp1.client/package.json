@@ -17,10 +17,12 @@
     "@tailwindcss/vite": "^4.1.12",
     "antd": "^5.27.2",
     "font-awesome": "^4.7.0",
+    "html2pdf.js": "^0.12.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.8.2",
-    "tailwindcss": "^4.1.12"
+    "tailwindcss": "^4.1.12",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",

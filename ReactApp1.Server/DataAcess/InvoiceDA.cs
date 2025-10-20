@@ -15,42 +15,96 @@ namespace ReactApp1.Server.DataAcess
             _context = context;
         }
 
-        public async Task<InvoiceResponseModel> createInvoiceAsync(InvoiceDto invoiceRequestDto)
+        public async Task<InvoiceResponseModel> getInvoiceByInvoiceIdAsync (string invoiceId)
         {
-            // find invoice
-            var foundInvoice = await _context.Invoices.FirstOrDefaultAsync(
-                    x => x.CustomerId == invoiceRequestDto.CustomerId && x.CreatedDate.Date == DateTime.UtcNow.Date
-                  );
-            if(foundInvoice != null)
-            {
-                return new InvoiceResponseModel
-                {
-                    InvoiceData = foundInvoice,
-                    IsNew = false,
-                };
-            }
-
-            var invoice = new Invoice
-            {
-                TotalBalance = invoiceRequestDto.TotalBalance,
-                PaidAmount = invoiceRequestDto.PaidAmount,
-                RemainingBalance = invoiceRequestDto.RemainingBalance,
-                CreatedDate = DateTime.UtcNow,
-                CreatedBy = "Admin",
-                CustomerId = invoiceRequestDto.CustomerId,
-            };
-            await _context.AddAsync(invoice);
-            var result = await _context.SaveChangesAsync();
-            if(result <= 0)
-            {
-                throw new Exception("Failed to create Invoice.");
-            }
+            List<Invoice> invoices =  await _context.Invoices
+                .Where(x => x.InvoiceId == invoiceId)
+                .ToListAsync();
             return new InvoiceResponseModel
             {
-                InvoiceData = invoice,
+                InvoiceDataList = invoices,
+            };
+        }
+        public async Task<InvoiceResponseModel> createInvoiceAsync(List<InvoiceDto> invoiceRequestDto)
+        {
+            // find invoice
+            foreach(var i in invoiceRequestDto)
+            {
+                var foundInvoice = await _context.Invoices.FirstOrDefaultAsync(
+                    x => x.CustomerId == i.CustomerId && 
+                    x.OrderItemId == i.OrderItemId && 
+                    x.CreatedDate.Date == DateTime.UtcNow.Date
+                  );
+                if (foundInvoice != null)
+                {
+                    return new InvoiceResponseModel
+                    {
+                        InvoiceData = foundInvoice,
+                        IsNew = false,
+                    };
+                }
+
+                var invoice = new Invoice
+                {
+                    InvoiceId = i.InvoiceId,
+                    TotalBalance = i.TotalBalance,
+                    PaidAmount = i.PaidAmount,
+                    RemainingBalance = i.RemainingBalance,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = "Admin",
+                    CustomerId = i.CustomerId,
+                    OrderItemId = i.OrderItemId,
+                };
+                await _context.AddAsync(invoice);
+                var result = await _context.SaveChangesAsync();
+
+                
+            }
+               
+            return new InvoiceResponseModel
+            {
+                //InvoiceData = invoice,
                 IsNew = true,
             };
                 
+        }
+
+        public async Task<InvoiceResponseModel> updateInvoiceAsync(InvoiceUpdateDto invoiceUpdateRequestDto)
+        {
+            // find 
+            var foundInvoices = await _context.Invoices
+                .Where(x => x.InvoiceId == invoiceUpdateRequestDto.InvoiceId)
+                .ToListAsync();
+
+            if(foundInvoices is null)
+            {
+                return new InvoiceResponseModel
+                {
+                    InvoiceDataList = foundInvoices,
+                };
+            }
+
+            // update
+            foreach(var foundInvoice in foundInvoices)
+            {
+                foundInvoice.TotalBalance = invoiceUpdateRequestDto.TotalBalance;
+                foundInvoice.PaidAmount = invoiceUpdateRequestDto.PaidAmount;
+                foundInvoice.RemainingBalance = invoiceUpdateRequestDto.RemainingBalance;
+                foundInvoice.CreatedDate = DateTime.UtcNow;
+                foundInvoice.CreatedBy = "Admin";
+                foundInvoice.CustomerId = invoiceUpdateRequestDto.CustomerId;
+            }
+            
+            
+            var result = await _context.SaveChangesAsync();
+            //if(result <= 0)
+            //{
+            //    throw new Exception("Failed to update Invoice.");
+            //}
+            return new InvoiceResponseModel
+            {
+                InvoiceDataList = foundInvoices,
+            };
         }
     }
 }

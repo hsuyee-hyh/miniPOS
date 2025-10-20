@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,5 +34,10 @@ namespace ReactApp1.Server.Database.Models
         [Required]
         public int CustomerId { get; set; }
 
+        // fk
+        [ForeignKey(nameof(OrderId))]
+        public Order Order { get; set; }
+
+        public Invoice Invoice { get; set; }
     }
 }
