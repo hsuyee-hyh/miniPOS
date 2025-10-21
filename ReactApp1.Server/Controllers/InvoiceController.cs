@@ -21,6 +21,32 @@ namespace ReactApp1.Server.Controllers
             _invoiceDA = invoiceDA;
         }
 
+        //invoice list including Customerinfo
+        [HttpGet("list")]
+        public async Task<IActionResult> GetInvoiceList()
+        {
+            try
+            {
+                var invoiceList =await _invoiceDA.getInvoiceListAsync();
+                if(invoiceList is null || invoiceList.Count <= 0)
+                {
+                    return NotFound(new
+                    {
+                        error = "Invoice list not found."
+                    });
+                }
+                return Ok(new
+                {
+                    success = "Invoice lists are found",
+                    invoiceList = invoiceList
+                });
+            }catch(Exception ex)
+            {
+                return BadRequest(new {error = ex.Message});
+            }
+        }
+
+
         [HttpGet("{invoiceId}")]
         public async Task<IActionResult> getInvoiceByInvoiceId (string invoiceId)
         {
@@ -48,6 +74,45 @@ namespace ReactApp1.Server.Controllers
             }catch(Exception ex)
             {
                 return BadRequest(new {error = ex.Message});
+            }
+        }
+
+        [HttpGet("{invoiceId}/customer/{customerId}")]
+        public async Task<IActionResult> getInvoiceByCustomerId (string invoiceId, string customerId)
+        {
+            try
+            {
+                string invId = _invoiceService.checkInvoiceId(invoiceId);
+                int cusId = _invoiceService.checkCustomerId(customerId);
+
+                // find all invoices that its paid amount is not zero
+                InvoiceResponseModel result = await _invoiceDA.getInvoiceByCustomerIdAsync(invId, cusId); 
+                
+                if(result.CreatedInvoiceDataList is null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Created Invoice is not found."
+                    });
+                }
+                if(result.InvoiceDataList?.Count <= 0) {
+                    return Ok(new
+                    {
+                        error = "There isn't any Left Balance."
+                    });
+                }
+                return Ok(new
+                {
+                    success = "These are invoices with Left Balance",
+                    createdInvoiceList = result.CreatedInvoiceDataList,
+                    invoiceList = result.InvoiceDataList,
+                });
+            }catch(Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = ex.Message,
+                });
             }
         }
 

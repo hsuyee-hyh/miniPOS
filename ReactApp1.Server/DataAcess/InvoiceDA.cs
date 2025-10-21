@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using ReactApp1.Server.Database;
 using ReactApp1.Server.Database.Models;
 using ReactApp1.Server.RequestModels;
@@ -15,6 +16,25 @@ namespace ReactApp1.Server.DataAcess
             _context = context;
         }
 
+        public async Task<List<InvoiceDto>> getInvoiceListAsync()
+        {
+            var invoiceList = await _context.Invoices
+                .Include(i => i.Customer)
+                .Select(i => new InvoiceDto
+                {
+                    InvoiceId = i.InvoiceId,
+                    TotalBalance = i.TotalBalance,
+                    PaidAmount  = i.PaidAmount,
+                    RemainingBalance = i.RemainingBalance,
+                    CreatedDate = i.CreatedDate,
+                    CreatedBy = i.CreatedBy,
+                    CustomerId = i.CustomerId,
+                    OrderItemId = i.OrderItemId,
+                    CustomerName = i.Customer.CustomerName,
+                })
+                .ToListAsync();
+            return invoiceList;
+        }
         public async Task<InvoiceResponseModel> getInvoiceByInvoiceIdAsync (string invoiceId)
         {
             List<Invoice> invoices =  await _context.Invoices
@@ -25,6 +45,33 @@ namespace ReactApp1.Server.DataAcess
                 InvoiceDataList = invoices,
             };
         }
+
+
+        public async Task<InvoiceResponseModel> getInvoiceByCustomerIdAsync (string invoiceId, int customerId)
+        {
+            // find Invoice
+            var createdInvoiceList = await _context.Invoices
+                .Where(x => x.InvoiceId == invoiceId)
+                .ToListAsync();
+
+                
+            // find invoices that its paid amount is not zero
+            var invoices = await _context.Invoices
+                .Where(x => x.CustomerId == customerId && x.RemainingBalance != 0)
+                .ToListAsync();
+           
+            // add to list
+            //List<Invoice> invoiceList = new List<Invoice>();
+            //invoices.ForEach(inv =>
+            //{
+            //    invoiceList.Add(new Invoice { InvoiceId = inv.InvoiceId, PaidAmount = inv.PaidAmount });
+            //});
+
+            return new InvoiceResponseModel {
+                CreatedInvoiceDataList = createdInvoiceList,
+                InvoiceDataList = invoices,
+            };
+        }
         public async Task<InvoiceResponseModel> createInvoiceAsync(List<InvoiceDto> invoiceRequestDto)
         {
             // find invoice
@@ -32,8 +79,8 @@ namespace ReactApp1.Server.DataAcess
             {
                 var foundInvoice = await _context.Invoices.FirstOrDefaultAsync(
                     x => x.CustomerId == i.CustomerId && 
-                    x.OrderItemId == i.OrderItemId && 
-                    x.CreatedDate.Date == DateTime.UtcNow.Date
+                    x.OrderItemId == i.OrderItemId 
+                    //x.CreatedDate == DateTimeOffset.Now
                   );
                 if (foundInvoice != null)
                 {
@@ -54,11 +101,30 @@ namespace ReactApp1.Server.DataAcess
                     CreatedBy = "Admin",
                     CustomerId = i.CustomerId,
                     OrderItemId = i.OrderItemId,
+                    
                 };
                 await _context.AddAsync(invoice);
                 var result = await _context.SaveChangesAsync();
 
-                
+                // Get the OrderItem related to this invoice
+                var orderItem = await _context.OrderItems
+                    .FirstOrDefaultAsync(oi => oi.Id == i.OrderItemId);
+                if (orderItem is null)
+                {
+                    throw new Exception("OrderItem not found to mark as invoice generated.");
+                }
+                // Update the flag
+                orderItem.IsGeneratedInvoice = true;
+
+                // define order.IsGeneratedInvoice true
+                var order =await _context.Orders
+                    .FirstOrDefaultAsync(x => x.Id == orderItem.OrderId);
+                if(order is null)
+                {
+                    throw new Exception("Order is not found to defined as invoice generated.");
+                };
+                order.IsGeneratedInvoice = true;
+                _context.SaveChanges();                
             }
                
             return new InvoiceResponseModel

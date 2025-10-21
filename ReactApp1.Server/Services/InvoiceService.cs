@@ -1,4 +1,5 @@
 ﻿using ReactApp1.Server.RequestModels;
+using System.Numerics;
 
 namespace ReactApp1.Server.Services
 {
@@ -65,6 +66,24 @@ namespace ReactApp1.Server.Services
             {
                 throw new Exception("CustomerId cannot for update be null or negative");
             }
+        }
+
+        public string checkInvoiceId(string invoiceId)
+        {
+            if(invoiceId is null || string.IsNullOrWhiteSpace(invoiceId))
+            {
+                throw new Exception("InvoiceId cannot be null");
+            }
+            return invoiceId;
+        }
+
+        public int checkCustomerId (string customerId)
+        {
+            if(int.Parse(customerId) < 0)
+            {
+                throw new Exception("Customer Id cannot be zero or negative");
+            }
+            return int.Parse(customerId);
         }
     }
 }

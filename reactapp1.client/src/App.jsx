@@ -18,6 +18,7 @@ import CustomerOrderEdit from "./Customer/CustomerOrderEdit";
 import ShowInvoice from "./Invoice/ShowInvoice";
 import InvoiceCreation from "./Invoice/InvoiceCreation";
 import CustomerEdit from "./Customer/CustomerEdit";
+import InvoiceList from "./Invoice/InvoiceList";
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
 
           <Route path="/customer/:customerId/create-orderitem" element={<InvoiceCreation/>} />
           <Route path="/customer/:customerId/invoice/:invoiceId" element= {<ShowInvoice/>} />
+          <Route path="/invoice" element={<InvoiceList/>} />
         </Routes>
       </div>
     </>

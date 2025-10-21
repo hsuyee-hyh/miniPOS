@@ -60,6 +60,13 @@ namespace ReactApp1.Server.Database
                 .WithOne(oi => oi.Invoice)
                 .HasForeignKey<Invoice>(i => i.OrderItemId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // one customer -> many Invoices
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Customer)
+                .WithMany(c => c.Invoices)
+                .HasForeignKey(i => i.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

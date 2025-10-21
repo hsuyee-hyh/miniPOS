@@ -23,5 +23,9 @@ namespace ReactApp1.Server.Models
 
         [Required]
         public int CustomerId { get; set; }
+
+        [Required]
+        public bool IsGeneratedInvoice { get; set; }
+
     }
 }

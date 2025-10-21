@@ -16,6 +16,8 @@ import {
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { v4 } from "uuid";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBoxOpen } from "@fortawesome/free-solid-svg-icons";
 
 export default function InvoiceCreation() {
   const { customerId } = useParams();
@@ -64,10 +66,14 @@ export default function InvoiceCreation() {
       try {
         console.log("fetching order .....", customerId);
         const orderResponse = await fetch(
-          `https://localhost:7299/api/order?customerId=${customerId}`
+          `https://localhost:7299/api/order/customer/${customerId}`
         );
         const orderData = await orderResponse.json();
-        console.log("fetch Order data: ", orderData);
+        // console.log("fetch Order data: ", orderData);
+        if (orderData.error) {
+          setErrorMsg(orderData.error);
+          return;
+        }
 
         // if (!orderResponse.ok) {
         // message.error(orderData.message);
@@ -298,18 +304,28 @@ export default function InvoiceCreation() {
           "foundInvoice",
           JSON.stringify(invoiceResponseData.foundInvoice)
         );
+      }
+      if (invoiceResponseData.isNew == true) {
         setSuccessMsg("Invoice is created successfully.");
-        return;
+        // for not memory load
+        localStorage.setItem(
+          "foundInvoice",
+          JSON.stringify(invoiceBodyData)
+        );
       }
     } catch (err) {
-      console.log("Error occured while creating invoice: ", err);
-      setErrorMsg(err.message);
+      console.error("Error occured while creating invoice: ", err);
+      setErrorMsg(
+        err.message || "Something went wrong while submiting the invoice"
+      );
     }
   };
 
   const handleShowSubmit = () => {
     const stored = localStorage.getItem("foundInvoice");
-    const foundInvoice = stored ? JSON.parse(stored) : null;
+    const foundInvoices = stored ? JSON.parse(stored) : null;
+    const foundInvoice = foundInvoices[0];
+    console.log("local storage found Invoice: ", foundInvoice);
     navigate(`/customer/${customerId}/invoice/${foundInvoice?.invoiceId}`);
   };
 
@@ -372,10 +388,11 @@ export default function InvoiceCreation() {
             <Form form={form}>
               <div className="flex flex-col my-2 mx-4 space-y-2 flex-1">
                 {formData.orders.length === 0 ? (
-                  <div className="flex justify-center items-center">
-                    <p className="text-xl text-gray-300">
-                      No orders found for that customer
-                    </p>
+                  <div className="flex flex-col justify-center items-center my-24">
+                    <FontAwesomeIcon icon={faBoxOpen} size="2xl" color="gray" />
+                    <div className="text-gray-500 flex justify-center items-center">
+                      There aren't no orders to create Invoice.
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -396,7 +413,7 @@ export default function InvoiceCreation() {
                           borderColor: "#3396D3",
                           color: "#3396D3",
                           marginRight: "40px",
-                          marginLeft: "10px"
+                          marginLeft: "10px",
                         }}
                       >
                         Show Invoice

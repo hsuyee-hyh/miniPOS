@@ -8,8 +8,9 @@ export default function ShowInvoice() {
   const invoiceRef = useRef(null);
 
   const [errorMsg, setErrorMsg] = useState("");
-  const [invoice, setInvoice] = useState(null);
-  const [invId,setInvId] = useState("");
+  const [createdInvoiceList, setCreatedInvoiceList] = useState(null);
+  const [prevInvoiceList, setPrevInvoiceList] = useState(null);
+  const [invId, setInvId] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderItems, setOrderItems] = useState([]);
   const [customer, setCustomer] = useState(null);
@@ -40,7 +41,7 @@ export default function ShowInvoice() {
 
         if (customerResponseData.success) {
           setCustomer(customerResponseData.customer);
-          console.log("customer info: ", customerResponseData.customer);
+          // console.log("customer info: ", customerResponseData.customer);
         }
       } catch (err) {
         setErrorMsg("Something went wrong while retreiving Customer Infos.");
@@ -56,7 +57,7 @@ export default function ShowInvoice() {
       try {
         setLoading(true);
         const invoiceResponse = await fetch(
-          `https://localhost:7299/api/invoice/${invoiceId}`
+          `https://localhost:7299/api/invoice/${invoiceId}/customer/${customerId}`
         );
         const invoiceResponseData = await invoiceResponse.json();
         console.log("InvoiceResponseData: ", invoiceResponseData);
@@ -64,14 +65,15 @@ export default function ShowInvoice() {
           setErrorMsg(invoiceResponseData.error);
           setLoading(false);
         }
-        setInvoice(invoiceResponseData.invoiceList.invoiceDataList);
+        setCreatedInvoiceList(invoiceResponseData.createdInvoiceList);
+        setPrevInvoiceList(invoiceResponseData.invoiceList);
         // setInvId(invoiceResponseData.invoiceList.invoiceDataList[0].invoiceId);
-        // localStorage.setItem("foundInvoice", 
-          // JSON.stringify(invoiceResponseData.invoiceList.invoiceDataList[0].invoiceId)
+        // localStorage.setItem("foundInvoice",
+        // JSON.stringify(invoiceResponseData.invoiceList.invoiceDataList[0].invoiceId)
         // );
 
         // set orderitemIds
-        const orderIds = invoiceResponseData.invoiceList.invoiceDataList.map(
+        const orderIds = invoiceResponseData.createdInvoiceList.map(
           (o) => o.orderItemId
         );
         console.log(orderIds);
@@ -187,7 +189,7 @@ export default function ShowInvoice() {
         </div>
         ${contentClone.innerHTML}
 
-        <div style="text-align: center; margin-top: 10px;">Thank you for your purchase.</div>
+        <div style="text-align: center; margin-top: 10px;">Thank you for your paid.</div>
         
         <script>
           window.onload = function() {
@@ -246,13 +248,17 @@ export default function ShowInvoice() {
 
                   <div>
                     <span className="mr-4">Created by:</span>
-                    <span className="font-bold">{invoice[0].createdBy}</span>
+                    <span className="font-bold">
+                      {createdInvoiceList[0].createdBy}
+                    </span>
                   </div>
 
                   <div>
                     <span className="mr-4">Created Date:</span>
                     <span className="font-bold">
-                      {new Date(invoice[0].createdDate).toLocaleString()}
+                      {new Date(
+                        createdInvoiceList[0].createdDate
+                      ).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -295,8 +301,8 @@ export default function ShowInvoice() {
             </Col>
           </Row>
 
-          {invoice && invoice.length > 0 ? (
-            invoice.map((inv) => {
+          {createdInvoiceList && createdInvoiceList.length > 0 ? (
+            createdInvoiceList.map((inv) => {
               const relatedOrderItems = orderItems.filter(
                 (item) => item.id === inv.orderItemId
               );
@@ -341,9 +347,13 @@ export default function ShowInvoice() {
             <div className="text-gray-400 text-lg">Invoice data not found</div>
           )}
 
-          {invoice && invoice.length > 0 && (
+          {createdInvoiceList && createdInvoiceList.length > 0 && (
             <div>
-              <Row key={invoice[0].invoiceId} justify="center" align="start">
+              <Row
+                key={createdInvoiceList[0].invoiceId}
+                justify="center"
+                align="start"
+              >
                 <Col xs={4} sm={6} md={4}></Col>
                 <Col xs={4} sm={6} md={4}></Col>
                 <Col
@@ -360,11 +370,15 @@ export default function ShowInvoice() {
                   md={4}
                   className="border border-gray-300 p-3"
                 >
-                  {invoice[0].totalBalance}
+                  {createdInvoiceList[0].totalBalance}
                 </Col>
               </Row>
 
-              <Row key={invoice[0].invoiceId} justify="center" align="start">
+              <Row
+                key={createdInvoiceList[0].invoiceId}
+                justify="center"
+                align="start"
+              >
                 <Col xs={4} sm={6} md={4}></Col>
                 <Col xs={4} sm={6} md={4}></Col>
                 <Col
@@ -381,11 +395,17 @@ export default function ShowInvoice() {
                   md={4}
                   className="border border-gray-300 p-3"
                 >
-                  <div className="font-semibold">{invoice[0].paidAmount}</div>
+                  <div className="font-semibold">
+                    {createdInvoiceList[0].paidAmount}
+                  </div>
                 </Col>
               </Row>
 
-              <Row key={invoice[0].invoiceId} justify="center" align="start">
+              <Row
+                key={createdInvoiceList[0].invoiceId}
+                justify="center"
+                align="start"
+              >
                 <Col xs={4} sm={6} md={4}></Col>
                 <Col xs={4} sm={6} md={4}></Col>
                 <Col
@@ -403,11 +423,84 @@ export default function ShowInvoice() {
                   className="border border-gray-300 p-3"
                 >
                   <div className="font-semibold text-red-500">
-                    {invoice[0].remainingBalance}
+                    {createdInvoiceList[0].remainingBalance}
                   </div>
                 </Col>
               </Row>
             </div>
+          )}
+
+          {/* previour left balance */}
+          {prevInvoiceList && prevInvoiceList.length > 0 && (
+            <>
+              {prevInvoiceList.map((prevInv) => {
+                const date = new Date(prevInv.createdDate);
+                return (
+                  <Row key={prevInv.id} justify="center" align="start">
+                    <Col xs={4} sm={6} md={4}>
+                      {/* Purchased Date */}
+                    </Col>
+                    <Col xs={4} sm={6} md={4}>
+                      {/* {date.toLocaleString()} */}
+                    </Col>
+                    <Col
+                      xs={4}
+                      sm={6}
+                      md={4}
+                      className="border border-gray-300 p-3"
+                    >
+                      <div>
+                        <span className="font-semibold">Left Balance</span>
+                        <span> ({date.toLocaleDateString()})</span>
+                      </div>
+                    </Col>
+                    <Col
+                      xs={4}
+                      sm={6}
+                      md={4}
+                      className="border border-gray-300 p-3"
+                    >
+                      <div className="font-semibold text-red-500">
+                        {prevInv.remainingBalance}
+                      </div>
+                    </Col>
+                  </Row>
+                );
+              })}
+
+              {/* Total Row */}
+              <Row key="total" justify="center" align="start">
+                <Col xs={4} sm={6} md={4}>
+                  {/* Optional */}
+                </Col>
+                <Col xs={4} sm={6} md={4}>
+                  {/* Optional */}
+                </Col>
+                <Col
+                  xs={4}
+                  sm={6}
+                  md={4}
+                  className="border border-gray-300 p-3"
+                >
+                  <div>
+                    <span className="font-semibold">Total Left Balance</span>
+                  </div>
+                </Col>
+                <Col
+                  xs={4}
+                  sm={6}
+                  md={4}
+                  className="border border-gray-300 p-3"
+                >
+                  <div className="font-semibold text-red-600">
+                    {prevInvoiceList.reduce(
+                      (sum, inv) => sum + inv.remainingBalance,
+                      0
+                    ) + (createdInvoiceList?.[0]?.remainingBalance || 0)}
+                  </div>
+                </Col>
+              </Row>
+            </>
           )}
         </div>
 
@@ -416,7 +509,7 @@ export default function ShowInvoice() {
             type="primary"
             onClick={handlePrint}
             className="mt-4 bg-blue-600 text-white size-96"
-            disabled={!invoice || loading}
+            // disabled={!createdInvoiceList || loading}
           >
             Print Invoice
           </Button>

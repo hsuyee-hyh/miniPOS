@@ -16,10 +16,14 @@ namespace ReactApp1.Server.RequestModels
         [Required]
         public decimal RemainingBalance { get; set; }
 
+        public DateTimeOffset? CreatedDate { get; set; }
+        public string? CreatedBy { get; set; }
+
         [Required]
         public int CustomerId { get; set; }
 
-        [Required]
-        public int OrderItemId { get; set; }
+        public int? OrderItemId { get; set; }
+
+        public string? CustomerName { get; set; }
     }
 }

@@ -49,6 +49,7 @@ export default function CustomerDetail() {
     }
   }, [customerId]);
 
+  // fetch order
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -59,9 +60,11 @@ export default function CustomerDetail() {
         if (!response.ok) {
           setErrorMsg(data.message);
         }
+        // console.log("Order data: ", data);
+        // console.log("latest date: ", data[0].createdDate);
         setOrders(data);
       } catch (err) {
-        // setErrorMsg(err.message || "Failed to fetch the orders.");
+        setErrorMsg(err.message || "Failed to fetch the orders.");
       }
     };
     fetchOrder();
@@ -97,6 +100,15 @@ export default function CustomerDetail() {
       title: "Quantity",
       dataIndex: "quantity",
       key: "quantity",
+    },
+    {
+      title: "Created Date",
+      dataIndex: "createdDate",
+      key: "createdDate",
+      render: (text) => {
+        const date = new Date(text);
+        return date.toLocaleString();
+      },
     },
     {
       title: "Actions",
@@ -256,13 +268,14 @@ export default function CustomerDetail() {
               Create Order
             </Button>
 
+            {/* order item with createdDate  */}
             <Button
               style={{ backgroundColor: "#ffffff", borderColor: "#3396D3" }}
               onClick={() =>
                 navigate(`/customer/${foundCustomer.id}/create-orderitem`)
               }
             >
-              Go to Item
+              Create Invoice
             </Button>
           </div>
 
