@@ -54,10 +54,12 @@ namespace ReactApp1.Server.DataAcess
                 .Where(x => x.InvoiceId == invoiceId)
                 .ToListAsync();
 
+            var firstItem = createdInvoiceList.First();
+
                 
             // find invoices that its paid amount is not zero
             var invoices = await _context.Invoices
-                .Where(x => x.CustomerId == customerId && x.RemainingBalance != 0)
+                .Where(x => x.CustomerId == customerId && x.RemainingBalance != 0 && x.CreatedDate<firstItem.CreatedDate)
                 .ToListAsync();
            
             // add to list
