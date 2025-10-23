@@ -47,7 +47,27 @@ namespace ReactApp1.Server.DataAcess
         }
 
 
-        public async Task<InvoiceResponseModel> getInvoiceByCustomerIdAsync (string invoiceId, int customerId)
+        public async Task<IEnumerable<object>> getInvoiceByCustomerIdAsync(int customerId)
+        {
+            var invoiceList = await _context.Invoices
+                .Where(x => x.CustomerId == customerId)
+                .Select(x => new
+                {
+                    x.InvoiceId,
+                    x.CustomerId,
+                    CustomerName = x.Customer.CustomerName,
+                    x.TotalBalance,
+                    x.PaidAmount,
+                    x.RemainingBalance,
+                    x.CreatedDate,
+                    x.CreatedBy,
+                })
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync();
+
+            return invoiceList;
+        }
+        public async Task<InvoiceResponseModel> getInvoiceByInvoiceIdCustomerIdAsync (string invoiceId, int customerId)
         {
             // find Invoice
             var createdInvoiceList = await _context.Invoices
