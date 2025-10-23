@@ -61,6 +61,7 @@ export default function ShowInvoice() {
         );
         const invoiceResponseData = await invoiceResponse.json();
         console.log("InvoiceResponseData: ", invoiceResponseData);
+        
         if (invoiceResponseData.error) {
           setErrorMsg(invoiceResponseData.error);
           setLoading(false);
@@ -232,7 +233,7 @@ export default function ShowInvoice() {
         </div>
 
         <div className="flex-col items-center justify-center" ref={invoiceRef}>
-          <div className="flex justify-between sm:px-0 sm:mx-0 md:px-38 md:mx-10">
+          <div className="flex justify-between sm:px-0 sm:mx-0 md:px-6 lg:px-46 md:mx-10">
             <div className="flex flex-col ">
               {customer && (
                 <div className="flex flex-col mt-4">
@@ -270,7 +271,8 @@ export default function ShowInvoice() {
             <Col
               xs={4}
               sm={6}
-              md={4}
+              md={5}
+              lg={4}
               className="font-bold border border-gray-300 p-3"
             >
               Product
@@ -278,7 +280,8 @@ export default function ShowInvoice() {
             <Col
               xs={4}
               sm={6}
-              md={4}
+              md={5}
+              lg={4}
               className="font-bold border border-gray-300 p-3"
             >
               Total Selling Price
@@ -286,7 +289,8 @@ export default function ShowInvoice() {
             <Col
               xs={4}
               sm={6}
-              md={4}
+              md={5}
+              lg={4}
               className="font-bold border border-gray-300 p-3"
             >
               Quantity
@@ -294,7 +298,8 @@ export default function ShowInvoice() {
             <Col
               xs={4}
               sm={6}
-              md={4}
+              md={5}
+              lg={4}
               className="font-bold border border-gray-300 p-3"
             >
               Balance
@@ -311,7 +316,8 @@ export default function ShowInvoice() {
                   <Col
                     xs={4}
                     sm={6}
-                    md={4}
+                    md={5}
+                    lg={4}
                     className=" border border-gray-300 p-3"
                   >
                     {i.product}
@@ -319,7 +325,8 @@ export default function ShowInvoice() {
                   <Col
                     xs={4}
                     sm={6}
-                    md={4}
+                    md={5}
+                    lg={4}
                     className=" border border-gray-300 p-3"
                   >
                     {i.totalSellingCost}
@@ -327,7 +334,8 @@ export default function ShowInvoice() {
                   <Col
                     xs={4}
                     sm={6}
-                    md={4}
+                    md={5}
+                    lg={4}
                     className=" border border-gray-300 p-3"
                   >
                     {i.quantity}
@@ -335,7 +343,8 @@ export default function ShowInvoice() {
                   <Col
                     xs={4}
                     sm={6}
-                    md={4}
+                    md={5}
+                    lg={4}
                     className=" border border-gray-300 p-3"
                   >
                     {i.balance}
@@ -354,12 +363,13 @@ export default function ShowInvoice() {
                 justify="center"
                 align="start"
               >
-                <Col xs={4} sm={6} md={4}></Col>
-                <Col xs={4} sm={6} md={4}></Col>
+                <Col xs={4} sm={6} md={5} lg={4}></Col>
+                <Col xs={4} sm={6} md={5} lg={4}></Col>
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   Total Balance
@@ -367,7 +377,8 @@ export default function ShowInvoice() {
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   {createdInvoiceList[0].totalBalance}
@@ -379,12 +390,13 @@ export default function ShowInvoice() {
                 justify="center"
                 align="start"
               >
-                <Col xs={4} sm={6} md={4}></Col>
-                <Col xs={4} sm={6} md={4}></Col>
+                <Col xs={4} sm={6} md={5} lg={4}></Col>
+                <Col xs={4} sm={6} md={5} lg={4}></Col>
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   <div className="font-semibold">Paid Amount</div>
@@ -392,7 +404,8 @@ export default function ShowInvoice() {
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   <div className="font-semibold">
@@ -406,12 +419,13 @@ export default function ShowInvoice() {
                 justify="center"
                 align="start"
               >
-                <Col xs={4} sm={6} md={4}></Col>
-                <Col xs={4} sm={6} md={4}></Col>
+                <Col xs={4} sm={6} md={5} lg={4}></Col>
+                <Col xs={4} sm={6} md={5} lg={4}></Col>
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   <div className="font-semibold">Left Balance</div>
@@ -419,7 +433,8 @@ export default function ShowInvoice() {
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   <div className="font-semibold text-red-500">
@@ -437,16 +452,17 @@ export default function ShowInvoice() {
                 const date = new Date(prevInv.createdDate);
                 return (
                   <Row key={prevInv.id} justify="center" align="start">
-                    <Col xs={4} sm={6} md={4}>
+                    <Col xs={4} sm={6} md={5} lg={4}>
                       {/* Purchased Date */}
                     </Col>
-                    <Col xs={4} sm={6} md={4}>
+                    <Col xs={4} sm={6} md={5} lg={4}>
                       {/* {date.toLocaleString()} */}
                     </Col>
                     <Col
                       xs={4}
                       sm={6}
-                      md={4}
+                      md={5}
+                      lg={4}
                       className="border border-gray-300 p-3"
                     >
                       <div>
@@ -457,7 +473,8 @@ export default function ShowInvoice() {
                     <Col
                       xs={4}
                       sm={6}
-                      md={4}
+                      md={5}
+                      lg={4}
                       className="border border-gray-300 p-3"
                     >
                       <div className="font-semibold text-red-500">
@@ -470,16 +487,17 @@ export default function ShowInvoice() {
 
               {/* Total Row */}
               <Row key="total" justify="center" align="start">
-                <Col xs={4} sm={6} md={4}>
+                <Col xs={4} sm={6} md={5} lg={4}>
                   {/* Optional */}
                 </Col>
-                <Col xs={4} sm={6} md={4}>
+                <Col xs={4} sm={6} md={5} lg={4}>
                   {/* Optional */}
                 </Col>
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   <div>
@@ -489,7 +507,8 @@ export default function ShowInvoice() {
                 <Col
                   xs={4}
                   sm={6}
-                  md={4}
+                  md={5}
+                  lg={4}
                   className="border border-gray-300 p-3"
                 >
                   <div className="font-semibold text-red-600">

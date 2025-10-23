@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../Layout/Navbar";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Card,
   Input,
@@ -13,6 +13,7 @@ import {
   Col,
   Alert,
   Modal,
+  Table,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { v4 } from "uuid";
@@ -23,6 +24,7 @@ export default function InvoiceCreation() {
   const { customerId } = useParams();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   const [products, setProducts] = useState([]);
   const [balance, setBalance] = useState([]);
   const [paidAmountRequired, setPaidAmountRequired] = useState(false);
@@ -59,6 +61,84 @@ export default function InvoiceCreation() {
       return () => clearTimeout(timer);
     }
   }, [errorMsg, successMsg]);
+
+  // fetch invoice data
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const invoiceListResponse = await fetch(
+          `https://localhost:7299/api/invoice/customer/${customerId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const invoiceListResponseData = await invoiceListResponse.json();
+        console.log("invoiceListResponseData: ", invoiceListResponseData);
+
+        if (invoiceListResponseData.error) {
+          setErrorMsg(invoiceListResponseData.error);
+          return;
+        }
+
+        if (invoiceListResponseData.success) {
+          setInvoices(invoiceListResponseData.invoiceList);
+        }
+      } catch (err) {
+        setErrorMsg("Something went wrong while fetching the invoice data.");
+        console.error(err);
+      }
+    };
+    fetchInvoices();
+  }, [customerId]);
+
+  const columns = [
+    {
+      title: "Invoice ID",
+      dataIndex: "invoiceId",
+      key: "invoiceId",
+    },
+    {
+      title: "Customer Name",
+      dataIndex: "customerName",
+      key: "customerName",
+    },
+    {
+      title: "Created Date",
+      dataIndex: "createdDate",
+      key: "createdDate",
+      render: (text) => {
+        const date = new Date(text);
+        return date.toLocaleString();
+      },
+    },
+    {
+      title: "Created By",
+      dataIndex: "createdBy",
+      key: "createdBy",
+    },
+    {
+      title: "Actions",
+      dataIndex: "actions",
+      key: "actions",
+      render: (_, record) => {
+        return (
+          <>
+            <div className="flex space-x-4">
+              <Button
+                type="primary"
+                onClick={() => handleShowInvoice(record.invoiceId)}
+              >
+                Detail
+              </Button>
+            </div>
+          </>
+        );
+      },
+    },
+  ];
 
   // fetch order data
   useEffect(() => {
@@ -308,10 +388,7 @@ export default function InvoiceCreation() {
       if (invoiceResponseData.isNew == true) {
         setSuccessMsg("Invoice is created successfully.");
         // for not memory load
-        localStorage.setItem(
-          "foundInvoice",
-          JSON.stringify(invoiceBodyData)
-        );
+        localStorage.setItem("foundInvoice", JSON.stringify(invoiceBodyData));
       }
     } catch (err) {
       console.error("Error occured while creating invoice: ", err);
@@ -325,8 +402,12 @@ export default function InvoiceCreation() {
     const stored = localStorage.getItem("foundInvoice");
     const foundInvoices = stored ? JSON.parse(stored) : null;
     const foundInvoice = foundInvoices[0];
-    console.log("local storage found Invoice: ", foundInvoice);
+
     navigate(`/customer/${customerId}/invoice/${foundInvoice?.invoiceId}`);
+  };
+
+  const handleShowInvoice = (invoiceId1) => {
+    navigate(`/customer/${customerId}/invoice/${invoiceId1}`);
   };
 
   const showModal = () => {
@@ -384,14 +465,34 @@ export default function InvoiceCreation() {
         {errorMsg && <Alert message={errorMsg} type="error" showIcon />}
         {successMsg && <Alert message={successMsg} type="success" showIcon />}
         <div className="flex flex-col items-center mt-4">
-          <Card variant="outlined" className="w-[500px] md:w-[800px]">
+          <Card variant="outlined" className="w-[500px] md:w-[900px]">
             <Form form={form}>
               <div className="flex flex-col my-2 mx-4 space-y-2 flex-1">
                 {formData.orders.length === 0 ? (
-                  <div className="flex flex-col justify-center items-center my-24">
-                    <FontAwesomeIcon icon={faBoxOpen} size="2xl" color="gray" />
-                    <div className="text-gray-500 flex justify-center items-center">
-                      There aren't no orders to create Invoice.
+                  <div>
+                    <div className="flex flex-col justify-center items-center my-4">
+                      <FontAwesomeIcon
+                        icon={faBoxOpen}
+                        size="2xl"
+                        color="gray"
+                      />
+                      <div className="text-gray-500 flex flex-col justify-center items-center">
+                        <p>There aren't no orders to create Invoice.</p>
+                        <p>
+                          If you want to create 'New Invoice', go to previous
+                          page, and then{" "}
+                          <Link
+                            to={`/customer/${customerId}/create-order`}
+                            className="text-blue-500 underline"
+                          >
+                            Create Order
+                          </Link>{" "}
+                          firstly.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-10">
+                      <Table dataSource={invoices} columns={columns} />
                     </div>
                   </div>
                 ) : (

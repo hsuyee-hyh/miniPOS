@@ -27,8 +27,8 @@ namespace ReactApp1.Server.Controllers
         {
             try
             {
-                var invoiceList =await _invoiceDA.getInvoiceListAsync();
-                if(invoiceList is null || invoiceList.Count <= 0)
+                var invoiceList = await _invoiceDA.getInvoiceListAsync();
+                if (invoiceList is null || invoiceList.Count <= 0)
                 {
                     return NotFound(new
                     {
@@ -40,15 +40,15 @@ namespace ReactApp1.Server.Controllers
                     success = "Invoice lists are found",
                     invoiceList = invoiceList
                 });
-            }catch(Exception ex)
+            } catch (Exception ex)
             {
-                return BadRequest(new {error = ex.Message});
+                return BadRequest(new { error = ex.Message });
             }
         }
 
 
         [HttpGet("{invoiceId}")]
-        public async Task<IActionResult> getInvoiceByInvoiceId (string invoiceId)
+        public async Task<IActionResult> getInvoiceByInvoiceId(string invoiceId)
         {
             try
             {
@@ -56,9 +56,9 @@ namespace ReactApp1.Server.Controllers
                 {
                     throw new Exception("InvoiceId cannot be null.");
                 }
-                var invoiceList =await _invoiceDA.getInvoiceByInvoiceIdAsync(invoiceId);
+                var invoiceList = await _invoiceDA.getInvoiceByInvoiceIdAsync(invoiceId);
 
-                if(invoiceList.InvoiceDataList is null || invoiceList.InvoiceDataList.Count <= 0)
+                if (invoiceList.InvoiceDataList is null || invoiceList.InvoiceDataList.Count <= 0)
                 {
                     return NotFound(new
                     {
@@ -71,14 +71,35 @@ namespace ReactApp1.Server.Controllers
                     invoiceList = invoiceList
                 });
 
-            }catch(Exception ex)
+            } catch (Exception ex)
             {
-                return BadRequest(new {error = ex.Message});
+                return BadRequest(new { error = ex.Message });
             }
         }
 
+        [HttpGet("customer/{customerId}")]
+        public async Task<IActionResult> getInvoiceByCustomerId(string customerId)
+        {
+            int custId = _invoiceService.checkCustomerId(customerId);
+
+            var invoiceList =await _invoiceDA.getInvoiceByCustomerIdAsync(custId);
+            
+            if(invoiceList.Count() <= 0 )
+            {
+                return NotFound(new
+                {
+                    error = "Invoice List not found by that customer"
+                });
+            }
+            return Ok(new
+            {
+                success = "Invoice Lists are found by that customer",
+                invoiceList = invoiceList,
+            });
+        }
+
         [HttpGet("{invoiceId}/customer/{customerId}")]
-        public async Task<IActionResult> getInvoiceByCustomerId (string invoiceId, string customerId)
+        public async Task<IActionResult> getInvoiceByInvoiceIdCustomerId (string invoiceId, string customerId)
         {
             try
             {
@@ -86,7 +107,7 @@ namespace ReactApp1.Server.Controllers
                 int cusId = _invoiceService.checkCustomerId(customerId);
 
                 // find all invoices that its paid amount is not zero
-                InvoiceResponseModel result = await _invoiceDA.getInvoiceByCustomerIdAsync(invId, cusId); 
+                InvoiceResponseModel result = await _invoiceDA.getInvoiceByInvoiceIdCustomerIdAsync(invId, cusId); 
                 
                 if(result.CreatedInvoiceDataList is null)
                 {
@@ -98,7 +119,9 @@ namespace ReactApp1.Server.Controllers
                 if(result.InvoiceDataList?.Count <= 0) {
                     return Ok(new
                     {
-                        error = "There isn't any Left Balance."
+                        error = "There isn't any Left Balance.",
+                        createdInvoiceList = result.CreatedInvoiceDataList,
+                        invoiceList = result.InvoiceDataList,
                     });
                 }
                 return Ok(new
