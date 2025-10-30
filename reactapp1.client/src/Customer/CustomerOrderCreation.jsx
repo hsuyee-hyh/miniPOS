@@ -175,22 +175,6 @@ export default function CustomerOrderCreation() {
   const handleSubmit = (values) => {
     // console.log(formData);
     try {
-      // const custForm = new FormData();
-      // custForm.append("Product", formData.product);
-      // custForm.append("SellingPrice", formData.sellingPrice);
-      // custForm.append(
-      // "AdditionalSellingPrice",
-      // formData.additionalSellingPrice
-      // );
-      // custForm.append("ProductId", formData.productId);
-      // custForm.append("LabourCost", formData.labourCost);
-      // custForm.append("VehicleCost", formData.vehicleCost);
-      // custForm.append("TotalSellingCost", formData.totalSellingCost);
-      // custForm.append("Quantity", formData.quantity);
-      // custForm.append("UnitLevel",)
-      // custForm.append("CustomerId", customerId);
-      // console.log("customForm is ", custForm);
-
       const requestOrder = {
         product: formData.product,
         sellingPrice: formData.sellingPrice,

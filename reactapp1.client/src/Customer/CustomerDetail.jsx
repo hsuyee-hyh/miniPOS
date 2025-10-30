@@ -64,7 +64,7 @@ export default function CustomerDetail() {
         // console.log("latest date: ", data[0].createdDate);
         setOrders(data);
       } catch (err) {
-        setErrorMsg(err.message || "Failed to fetch the orders.");
+        setErrorMsg("There aren't any order. Create new order.");
       }
     };
     fetchOrder();
