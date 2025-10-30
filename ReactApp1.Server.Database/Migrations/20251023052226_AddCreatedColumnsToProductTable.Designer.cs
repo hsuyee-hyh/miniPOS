@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReactApp1.Server.Database;
 
@@ -11,9 +12,11 @@ using ReactApp1.Server.Database;
 namespace ReactApp1.Server.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251023052226_AddCreatedColumnsToProductTable")]
+    partial class AddCreatedColumnsToProductTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,10 +145,6 @@ namespace ReactApp1.Server.Database.Migrations
                     b.Property<decimal>("TotalSellingCost")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UnitLevel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("VehicleCost")
                         .HasColumnType("decimal(18,2)");
 
@@ -196,10 +195,6 @@ namespace ReactApp1.Server.Database.Migrations
                     b.Property<decimal>("TotalSellingCost")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UnitLevel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
@@ -233,9 +228,6 @@ namespace ReactApp1.Server.Database.Migrations
                     b.Property<string>("ImgUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Lvl1BuyingPrice")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("Lvl1SellingPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -243,29 +235,17 @@ namespace ReactApp1.Server.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("Lvl2BuyingPrice")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal?>("Lvl2SellingPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Lvl2Unit")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("Lvl3BuyingPrice")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal?>("Lvl3SellingPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Lvl3Unit")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("NumberOfUnit2")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOfUnit3")
-                        .HasColumnType("int");
 
                     b.Property<string>("ProductDescription")
                         .IsRequired()

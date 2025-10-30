@@ -36,8 +36,13 @@ namespace ReactApp1.Server.DataAcess
         public async Task<int> createOrderItemAsync(List<OrderItemDto> orderItemDtoRequest)
         {
             var result = 0;
+            
             foreach(var dto in orderItemDtoRequest)
             {
+                // assign order 
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(x => x.Id == dto.OrderId);
+
                 // find
                 var foundOrderItem = await _context.OrderItems.FirstOrDefaultAsync(
                      x => x.OrderId == dto.OrderId
@@ -54,11 +59,13 @@ namespace ReactApp1.Server.DataAcess
                     Product = dto.Product,
                     TotalSellingCost = dto.TotalSellingCost,
                     Quantity = dto.Quantity,
+                    UnitLevel = dto.UnitLevel,
                     Balance = dto.Balance,
                     CustomerId = dto.CustomerId,
                     CreatedDate = DateTimeOffset.Now,
                     CreatedBy = "Admin",
                     IsGeneratedInvoice = false,
+                    Order = order!,
                 };
 
                 await _context.OrderItems.AddAsync(orderItem);

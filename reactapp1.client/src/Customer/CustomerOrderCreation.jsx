@@ -22,6 +22,7 @@ export default function CustomerOrderCreation() {
   const [loading, setLoading] = useState(true);
   const [foundProduct, setFoundProduct] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [availableUnits, setAvailableUnits] = useState([]);
   const [form] = useForm();
   const [formData, setFormData] = useState({
     product: "",
@@ -32,6 +33,8 @@ export default function CustomerOrderCreation() {
     vehicleCost: "",
     totalSellingCost: "",
     quantity: "",
+    unitLevel: "",
+    unitLevelOption: "",
   });
 
   // errorMsg
@@ -96,18 +99,28 @@ export default function CustomerOrderCreation() {
     const selected = products.find((x) => x.id == option.key);
     setSelectedProduct(selected);
 
+    const unitList = [];
+    if (selected) {
+      if (selected.lvl1Unit) unitList.push(selected.lvl1Unit);
+      if (selected.lvl2Unit) unitList.push(selected.lvl2Unit);
+      if (selected.lvl3Unit) unitList.push(selected.lvl3Unit);
+    }
+    setAvailableUnits(unitList);
+
     // antdesign field value
     form.setFieldsValue({
       product: value,
-      sellingPrice: selected ? selected.sellingPrice : 0,
+      // sellingPrice: selected ? selected.sellingPrice : 0,
       productId: selected ? selected.id : -1,
+      // unitLevel: selected ? unitList : null,
     });
 
     setFormData((prev) => ({
       ...prev,
       [fieldName]: value,
-      sellingPrice: selected ? selected.sellingPrice : 0,
+      // sellingPrice: selected ? selected.sellingPrice : 0,
       productId: selected ? selected.id : -1,
+      // unitLevel: selected ? unitList : null,
     }));
   };
 
@@ -118,43 +131,88 @@ export default function CustomerOrderCreation() {
     }));
   };
 
+  const handleUnitLevelSelectChange = (value, option, fieldName) => {
+    console.log("unitlevel option: ", option);
+
+    if (selectedProduct.lvl1Unit == value) {
+      console.log("lvl1 unit: ", selectedProduct.lvl1Unit);
+      console.log("lvl1 sellingprice: ", selectedProduct.lvl1SellingPrice);
+      form.setFieldsValue({
+        sellingPrice: selectedProduct.lvl1SellingPrice,
+        unitLevel: value,
+      });
+
+      setFormData((prev) => ({
+        ...prev,
+        sellingPrice: selectedProduct.lvl1SellingPrice,
+        unitLevel: value,
+      }));
+      console.log(formData);
+    } else if (selectedProduct.lvl2Unit == value) {
+      form.setFieldsValue({
+        sellingPrice: selectedProduct.lvl2SellingPrice,
+        unitLevel: value,
+      });
+
+      setFormData((prev) => ({
+        ...prev,
+        sellingPrice: selectedProduct.lvl2SellingPrice,
+        unitLevel: value,
+      }));
+    } else if (selectedProduct.lvl3Unit == value) {
+      form.setFieldsValue({
+        sellingPrice: selectedProduct.lvl3SellingPrice,
+        unitLevel: value,
+      });
+      setFormData((prev) => ({
+        ...prev,
+        sellingPrice: lvl3SellingPrice,
+        unitLevel: value,
+      }));
+    }
+  };
+
   const handleSubmit = (values) => {
     // console.log(formData);
     try {
-      const custForm = new FormData();
-      custForm.append("Product", formData.product);
-      custForm.append("SellingPrice", formData.sellingPrice);
-      custForm.append(
-      "AdditionalSellingPrice",
-      formData.additionalSellingPrice
-      );
-      custForm.append("ProductId", formData.productId);
-      custForm.append("LabourCost", formData.labourCost);
-      custForm.append("VehicleCost", formData.vehicleCost);
-      custForm.append("TotalSellingCost", formData.totalSellingCost);
-      custForm.append("Quantity", formData.quantity);
-      custForm.append("CustomerId", customerId);
+      // const custForm = new FormData();
+      // custForm.append("Product", formData.product);
+      // custForm.append("SellingPrice", formData.sellingPrice);
+      // custForm.append(
+      // "AdditionalSellingPrice",
+      // formData.additionalSellingPrice
+      // );
+      // custForm.append("ProductId", formData.productId);
+      // custForm.append("LabourCost", formData.labourCost);
+      // custForm.append("VehicleCost", formData.vehicleCost);
+      // custForm.append("TotalSellingCost", formData.totalSellingCost);
+      // custForm.append("Quantity", formData.quantity);
+      // custForm.append("UnitLevel",)
+      // custForm.append("CustomerId", customerId);
       // console.log("customForm is ", custForm);
 
-      // custForm.append("Product", values.product);
-      // custForm.append("SellingPrice", values.sellingPrice);
-      // custForm.append(
-        // "AdditionalSellingPrice",
-        // values.additionalSellingPrice || 0
-      // );
-      // custForm.append("ProductId", values.productId);
-      // custForm.append("LabourCost", values.labourCost);
-      // custForm.append("VehicleCost", values.vehicleCost);
-      // custForm.append("TotalSellingCost", values.totalSellingCost);
-      // custForm.append("Quantity", values.quantity);
+      const requestOrder = {
+        product: formData.product,
+        sellingPrice: formData.sellingPrice,
+        productId: formData.productId,
+        additionalSellingPrice: formData.additionalSellingPrice ?? 0,
+        labourCost: formData.labourCost,
+        vehicleCost: formData.vehicleCost,
+        totalSellingCost: formData.totalSellingCost,
+        quantity: formData.quantity,
+        unitLevel: formData.unitLevel,
+        customerId: customerId,
+      };
+      console.log("formData from submit is : ", requestOrder);
 
-      fetch(
-        `https://localhost:7299/api/order/create-order`,
-        {
-          method: "POST",
-          body: custForm,
-        }
-      )
+      fetch(`https://localhost:7299/api/order/create-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestOrder),
+        // body: custForm,
+      })
         .then((response) => {
           if (!response.ok) {
             message.error("Failed to create the order");
@@ -208,6 +266,61 @@ export default function CustomerOrderCreation() {
               </Select>
             </Form.Item>
 
+            <div className="flex flex-row">
+              <div className="mr-4">
+                <Form.Item
+                  label="Quantity"
+                  name="quantity"
+                  rules={[
+                    { required: true, message: "Please input the quantity!" },
+                  ]}
+                >
+                  <InputNumber
+                    placeholder="Quantity"
+                    name="quantity"
+                    value={formData.quantity}
+                    onChange={(value) => handleDataChange(value, "quantity")}
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+              </div>
+
+              <div className="md:w-46">
+                <Form.Item
+                  label="Unit"
+                  name="unitLevel"
+                  rules={[
+                    { required: true, message: "Please select unit level" },
+                  ]}
+                >
+                  <Select
+                    name="unitLevel"
+                    allowClear
+                    style={{ width: "100%" }}
+                    placeholder="Select UnitLevel"
+                    showSearch
+                    optionFilterProp="children"
+                    loading={loading}
+                    notFoundContent={
+                      loading ? <Spin size="small" /> : "No units found"
+                    }
+                    // onChange={(value) =>
+                    // setFormData((prev) => ({ ...prev, unitLevel: value }))
+                    // }
+                    onChange={(value, option) =>
+                      handleUnitLevelSelectChange(value, option, "unitLevel")
+                    }
+                  >
+                    {availableUnits.map((unit) => (
+                      <Select.Option key={unit} value={unit}>
+                        {unit}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
+
             <Form.Item
               label="Selling Price"
               name="sellingPrice"
@@ -228,7 +341,11 @@ export default function CustomerOrderCreation() {
               name="productId"
               rules={[{ required: true }]}
             >
-              <InputNumber value={formData.productId} readOnly style={{ width: "100%" }} />
+              <InputNumber
+                value={formData.productId}
+                readOnly
+                style={{ width: "100%" }}
+              />
             </Form.Item>
             <Form.Item
               label="Additional Selling Price"
@@ -298,21 +415,6 @@ export default function CustomerOrderCreation() {
                 name="totalSellingCost"
                 value={formData.totalSellingCost}
                 readOnly
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Quantity"
-              name="quantity"
-              rules={[
-                { required: true, message: "Please input the quantity!" },
-              ]}
-            >
-              <InputNumber
-                placeholder="Quantity"
-                name="quantity"
-                value={formData.quantity}
-                onChange={(value) => handleDataChange(value, "quantity")}
                 style={{ width: "100%" }}
               />
             </Form.Item>

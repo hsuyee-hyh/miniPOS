@@ -85,6 +85,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 });
 // register service
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<ProductDA>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<CustomerDA>();
 builder.Services.AddScoped<OrderService>();

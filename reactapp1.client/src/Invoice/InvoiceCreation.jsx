@@ -266,6 +266,7 @@ export default function InvoiceCreation() {
         product: formData.products.map((p) => p.productName),
         totalSellingCost: formData.orders.map((o) => o.totalSellingCost),
         quantity: formData.orders.map((o) => o.quantity),
+        unitLevel: formData.orders.map((o) => o.unitLevel),
         balance: formData.balances,
         customerId: formData.customerId,
         totalBalance: formData.totalBalance,
@@ -273,13 +274,15 @@ export default function InvoiceCreation() {
         remainingBalance: formData.remainingBalance,
       };
 
-      // convert to array of objects
+      // convert to array of objects (orderItem from Order)
+      // orderItem C# object
       const orderItems = data.orderId.map((id, index) => ({
         orderId: Number(id),
         productId: Number(data.productId[index]),
         product: data.product[index] || "unknown",
         totalSellingCost: Number(data.totalSellingCost[index]),
         quantity: Number(data.quantity[index]),
+        unitLevel: data.unitLevel[index],
         balance: Number(data.balance[index]),
         customerId: Number(data.customerId),
       }));
@@ -287,6 +290,7 @@ export default function InvoiceCreation() {
       console.log("OrderItems: ", orderItems);
 
       // convert to invoice array of objects
+      // invoice C# object
       const invoiceData = {
         totalBalance: Number(data.totalBalance),
         paidAmount: Number(data.paidAmount),
@@ -497,7 +501,7 @@ export default function InvoiceCreation() {
                   </div>
                 ) : (
                   <>
-                    <div className="flex justify-end mr-20 mt-2">
+                    <div className="flex justify-end  mt-2">
                       <Button
                         type="primary"
                         onClick={handleInvoiceSubmit}
@@ -508,12 +512,12 @@ export default function InvoiceCreation() {
                       <Button
                         type="primary"
                         onClick={handleShowSubmit}
-                        className="mr-10"
+                        
                         style={{
                           backgroundColor: "#ffffff",
                           borderColor: "#3396D3",
                           color: "#3396D3",
-                          marginRight: "40px",
+                          
                           marginLeft: "10px",
                         }}
                       >
@@ -534,6 +538,9 @@ export default function InvoiceCreation() {
                         </Col>
                         <Col span={4} className="font-bold">
                           Quantity
+                        </Col>
+                        <Col span={4} className="font-bold">
+                          Unit
                         </Col>
                         <Col span={4} className="font-bold">
                           Balance
@@ -586,6 +593,15 @@ export default function InvoiceCreation() {
 
                           <Col span={4}>
                             <Input
+                              name="UnitLevel"
+                              value={order.unitLevel}
+                              readOnly
+                              style={{ flex: 1 }}
+                            />
+                          </Col>
+
+                          <Col span={4}>
+                            <Input
                               name="balance"
                               value={formData.balances?.[index] || 0}
                               readOnly
@@ -598,6 +614,7 @@ export default function InvoiceCreation() {
 
                     {/* total balance: align with Balance column */}
                     <Row type="flex" className="mt-4">
+                      <Col span={4}></Col>
                       <Col span={4}></Col>
                       <Col span={4}></Col>
                       <Col span={4}></Col>
@@ -619,6 +636,7 @@ export default function InvoiceCreation() {
 
                     {/* Paid amount: align with Balance column  */}
                     <Row type="flex" className="mt-2">
+                      <Col span={4}></Col>
                       <Col span={4}></Col>
                       <Col span={4}></Col>
                       <Col span={4}></Col>
@@ -646,6 +664,7 @@ export default function InvoiceCreation() {
                       <Col span={4}></Col>
                       <Col span={4}></Col>
                       <Col span={4}></Col>
+                      <Col span={4}></Col>
                       <Col span={4}>
                         {" "}
                         <label className="mr-2">Left Balance: </label>
@@ -659,7 +678,7 @@ export default function InvoiceCreation() {
                         />
                       </Col>
                     </Row>
-                    <div className="flex justify-end mr-32 mt-2">
+                    <div className="flex justify-end mt-2">
                       <Button type="primary" onClick={handleSubmit}>
                         Save Item
                       </Button>

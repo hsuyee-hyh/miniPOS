@@ -30,6 +30,9 @@ namespace ReactApp1.Server.Database.Models
         public int Quantity { get; set; }
 
         [Required]
+        public string UnitLevel { get; set; }
+
+        [Required]
         public DateTimeOffset CreatedDate { get; set; }
         [Required]
         public string CreatedBy { get; set; }
