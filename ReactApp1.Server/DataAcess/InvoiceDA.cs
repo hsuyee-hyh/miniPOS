@@ -113,6 +113,7 @@ namespace ReactApp1.Server.DataAcess
                     };
                 }
 
+                // create invoice
                 var invoice = new Invoice
                 {
                     InvoiceId = i.InvoiceId,
@@ -137,10 +138,23 @@ namespace ReactApp1.Server.DataAcess
                 }
                 // Update the flag
                 orderItem.IsGeneratedInvoice = true;
+                // find product and decrease product stock
+                var product = await _context.Products
+                    .FirstOrDefaultAsync(x => x.Id == orderItem.ProductId);
+                if(orderItem.UnitLevel == product.Lvl1Unit)
+                {
+                    product.StockLvl1 = product.StockLvl1 - 1;
+                }else if(orderItem.UnitLevel == product.Lvl2Unit)
+                {
+                    product.StockLvl2 = product.StockLvl2 - 1;
+                }else if(orderItem.UnitLevel == product.Lvl3Unit)
+                {
+                    product.StockLvl3 = product.StockLvl3 - 1;
+                }
 
                 // define order.IsGeneratedInvoice true
-                var order =await _context.Orders
-                    .FirstOrDefaultAsync(x => x.Id == orderItem.OrderId);
+                var order = await _context.Orders
+                     .FirstOrDefaultAsync(x => x.Id == orderItem.OrderId);
                 if(order is null)
                 {
                     throw new Exception("Order is not found to defined as invoice generated.");
