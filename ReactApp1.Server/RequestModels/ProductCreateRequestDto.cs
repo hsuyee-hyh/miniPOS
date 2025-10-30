@@ -1,26 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace ReactApp1.Server.Database.Models
+namespace ReactApp1.Server.Models
 {
-    public class Product
+    public class ProductCreateRequestDto
     {
-        [Key]
-        public int Id { get; set; }
+
         [Required]
-        public string ProductName { get; set; } = string.Empty;
+        public string ProductName { get; set; }
         [Required]
-        public string ProductDescription { get; set; } = string.Empty;
+        public string ProductDescription { get; set; }
         [Required]
         public decimal BuyingPrice { get; set; }
         [Required]
         public decimal SellingPrice { get; set; }
         [Required]
-        public string Category { get; set; } = string.Empty;
+        public string Category { get; set; }
 
         [Required]
         public string Lvl1Unit { get; set; }
@@ -31,15 +25,13 @@ namespace ReactApp1.Server.Database.Models
         [Required]
         public decimal Lvl1SellingPrice { get; set; }
 
-        
         public int? NumberOfUnit2 { get; set; }
-
 
 
         public string? Lvl2Unit { get; set; }
         public int? StockLvl2 { get; set; }
         public decimal? Lvl2BuyingPrice { get; set; }
-        public decimal? Lvl2SellingPrice { get; set; }
+        public int? Lvl2SellingPrice { get; set; }
 
         public int? NumberOfUnit3 { get; set; }
 
@@ -47,17 +39,14 @@ namespace ReactApp1.Server.Database.Models
         public string? Lvl3Unit { get; set; }
         public int? StockLvl3 { get; set; }
         public decimal? Lvl3BuyingPrice { get; set; }
-        public decimal? Lvl3SellingPrice { get; set; }
+        public int? Lvl3SellingPrice { get; set; }
 
-        public string? ImgUrl { get; set; }
-        [Required]
-        public string ProductOwner { get; set; } = string.Empty;
 
-        [Required]
-        public DateTimeOffset CreatedDate {  get; set; }
+        public IFormFile? ImgUrl {  get; set; }
 
         [Required]
-        public string CreatedBy { get; set; }
+        public string ProductOwner { get; set; }
+
 
     }
 }

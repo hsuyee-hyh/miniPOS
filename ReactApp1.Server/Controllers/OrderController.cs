@@ -65,9 +65,18 @@ namespace ReactApp1.Server.Controllers
         }
 
         [HttpPost("create-order")]
-        public async Task<IActionResult> CreateOrderAsync( [FromForm] OrderDto requestOrder)
+        public async Task<IActionResult> CreateOrderAsync( [FromBody] OrderDto requestOrder)
         {
             _orderService.CreateOrder(requestOrder);
+
+            // customer
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(x => x.Id == requestOrder.CustomerId);
+
+            // product
+            //var product = await _context.Products
+            //    .FirstOrDefaultAsync(x => x.Id == requestOrder.ProductId);
+
             var order = new Order
             {
                 Product = requestOrder.Product,
@@ -79,11 +88,13 @@ namespace ReactApp1.Server.Controllers
                 VehicleCost = requestOrder.VehicleCost,
                 TotalSellingCost = requestOrder.TotalSellingCost,
                 Quantity = requestOrder.Quantity,
+                UnitLevel = requestOrder.UnitLevel,
                 CreatedDate = DateTimeOffset.Now,
                 CreatedBy = "Admin",
                 IsGeneratedInvoice = false,
 
                 CustomerId = requestOrder.CustomerId,
+                Customer = customer,
             };
             var createdOrder = await _context.Orders.AddAsync(order);
             var result = await _context.SaveChangesAsync();

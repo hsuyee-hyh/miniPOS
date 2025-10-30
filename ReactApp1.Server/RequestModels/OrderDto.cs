@@ -22,6 +22,9 @@ namespace ReactApp1.Server.Models
         public int Quantity { get; set; }
 
         [Required]
+        public string UnitLevel { get; set; }
+
+        [Required]
         public int CustomerId { get; set; }
 
         [Required]

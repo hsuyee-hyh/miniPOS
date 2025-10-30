@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ReactApp1.Server.DataAcess;
 using ReactApp1.Server.Database;
 using ReactApp1.Server.Database.Models;
 using ReactApp1.Server.Models;
+using ReactApp1.Server.Services;
+using System.ComponentModel;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace ReactApp1.Server.Controllers
@@ -15,10 +19,15 @@ namespace ReactApp1.Server.Controllers
     public class ProductController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ProductService _productService;
+        private readonly ProductDA _productDA;
 
-        public ProductController(AppDbContext context)
+
+        public ProductController(AppDbContext context, ProductService productService, ProductDA productDA)
         {
             _context = context;
+            _productService = productService;
+            _productDA = productDA;
         }
 
 
@@ -29,8 +38,28 @@ namespace ReactApp1.Server.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{productId}/units")]
+        public async Task<IActionResult> GetAllUnits(int productId)
+        {
+            _productService.checkProductId(productId);
+            
+            List<string> unitList =await _productDA.GetAllUnits(productId);
+            if (unitList.Count < 0 || unitList is null)
+            {
+                return BadRequest(new
+                {
+                    error = "Units are not found."
+                });
+            }
+            return Ok(new
+            {
+                success = "Units are found.",
+                unitList = unitList.Distinct(),
+            });
+        }
+
         [HttpPost("edit/{productId}")]
-        public async Task<IActionResult> EditProductById(int productId, [FromForm] ProductCreateDto dto)
+        public async Task<IActionResult> EditProductById(int productId, [FromForm] ProductCreateRequestDto dto)
         {
             if(productId <= 0)
             {
@@ -42,28 +71,28 @@ namespace ReactApp1.Server.Controllers
                 return BadRequest(new { message = "Product cannot found." });
             }
 
-            if (string.IsNullOrWhiteSpace(dto.productName) ||
-               string.IsNullOrWhiteSpace(dto.productDescription) ||
-               dto.buyingPrice == 0 ||
-               dto.sellingPrice == 0 ||
-               string.IsNullOrWhiteSpace(dto.category) ||
+            if (string.IsNullOrWhiteSpace(dto.ProductName) ||
+               string.IsNullOrWhiteSpace(dto.ProductDescription) ||
+               dto.BuyingPrice == 0 ||
+               dto.SellingPrice == 0 ||
+               string.IsNullOrWhiteSpace(dto.Category) ||
                //dto.stockLvl1 == 0 ||
                //string.IsNullOrWhiteSpace(product.ImgUrl) ||
-               string.IsNullOrWhiteSpace(dto.productOwner)
+               string.IsNullOrWhiteSpace(dto.ProductOwner)
            )
             {
                 return BadRequest(new { message = "All fields cannot be null." });
             }
 
-            product.ProductName = dto.productName;
-            product.ProductDescription = dto.productDescription;
-            product.BuyingPrice = dto.buyingPrice;
-            product.SellingPrice = dto.sellingPrice;
-            product.Category = dto.category;
-            product.StockLvl1 = dto.stockLvl1;
-            product.StockLvl2 = dto.stockLvl2;
-            product.StockLvl3 = dto.stockLvl3;
-            product.ProductOwner = dto.productOwner;
+            product.ProductName = dto.ProductName;
+            product.ProductDescription = dto.ProductDescription;
+            product.BuyingPrice = dto.BuyingPrice;
+            product.SellingPrice = dto.SellingPrice;
+            product.Category = dto.Category;
+            product.StockLvl1 = dto.StockLvl1;
+            product.StockLvl2 = dto.StockLvl2;
+            product.StockLvl3 = dto.StockLvl3;
+            product.ProductOwner = dto.ProductOwner;
 
             try
             {
@@ -95,70 +124,36 @@ namespace ReactApp1.Server.Controllers
         }
 
         [HttpPost("create-product")]
-        public async Task<IActionResult> CreateProductAsync([FromForm] ProductCreateDto dto)
+        public async Task<IActionResult> CreateProductAsync([FromForm] ProductCreateRequestDto productRequestData)
         {
-            string? fileName = null;
-
-            if (string.IsNullOrWhiteSpace(dto.productName) ||
-                string.IsNullOrWhiteSpace(dto.productDescription) ||
-                dto.buyingPrice == 0 ||
-                dto.sellingPrice == 0 ||
-                string.IsNullOrWhiteSpace(dto.category) ||
-                dto.stockLvl1 == 0 ||
-                //string.IsNullOrWhiteSpace(product.ImgUrl) ||
-                string.IsNullOrWhiteSpace(dto.productOwner)
-            )
+            try
             {
-                return BadRequest(new { message = "All fields cannot be null." });
-            }
-
-            var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.ProductName == dto.productName);
-            if (existingProduct != null)
-            {
-                return BadRequest(new { message = "Product is existed in list." });
-            }
-
-            if (dto.imgUrl != null && dto.imgUrl.Length > 0)
-            {
-                fileName = dto.imgUrl.FileName;
-
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/productImages");
-                if (!Directory.Exists(folderPath))
+                _productService.checkCreateInput(productRequestData);
+                int result =await _productDA.createProductAsync(productRequestData);
+                
+                if (result == 0)
                 {
-                    Directory.CreateDirectory(folderPath);
+                    return BadRequest(new { error = "Product already existed" });
                 }
 
-                var filePath = Path.Combine(folderPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await dto.imgUrl.CopyToAsync(stream);
+                if(result < 0) {
+                    return BadRequest(new { error = "Product creation didn't success." });
                 }
-            }
+                else
+                {
+                    return Ok(new { success = "Product creation success." });
+                }
+                    
 
-            var newProduct = new Product
-            {
-                ProductName = dto.productName,
-                ProductDescription = dto.productDescription,
-                BuyingPrice = dto.buyingPrice,
-                SellingPrice = dto.sellingPrice,
-                Category = dto.category,
-                StockLvl1 = dto.stockLvl1,
-                StockLvl2 = dto.stockLvl2 ?? 0,
-                StockLvl3 = dto.stockLvl3 ?? 0,
-                ProductOwner = dto.productOwner,
-                ImgUrl = fileName != null ? "/productImages/" + fileName : null
-            };
-
-            // insert 
-            await _context.Products.AddAsync(newProduct);
-            var result = await _context.SaveChangesAsync();
-            if (result == 0)
-            {
-                return BadRequest(new { message = "Failed to create Product" });
             }
-            return Ok(new { message = "Product creation success." });
-           
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = ex.Message,
+                });
+            }
+            
         }
 
 

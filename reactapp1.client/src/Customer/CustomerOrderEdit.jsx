@@ -13,6 +13,7 @@ export default function CustomerOrderEdit() {
   const [foundOrder, setFoundOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [availableUnits, setAvailableUnits] = useState([]);
 
   const [formData, setFormData] = useState({
     id: orderId,
@@ -23,6 +24,7 @@ export default function CustomerOrderEdit() {
     vehicleCost: 0,
     totalSellingCost: 0,
     quantity: 0,
+    unitLevel: "",
     customerId: customerId,
   });
 
@@ -124,12 +126,21 @@ export default function CustomerOrderEdit() {
 
   const handleSelectDataChange = (value, option, fieldName) => {
     const selected = products.find((x) => x.id == option.key);
-   
+
+    const unitList = [];
+    if (selected) {
+      if (selected.lvl1Unit) unitList.push(selected.lvl1Unit);
+      if (selected.lvl2Unit) unitList.push(selected.lvl2Unit);
+      if (selected.lvl3Unit) unitList.push(selected.lvl3Unit);
+    }
+    setAvailableUnits(unitList);
+
     // antdesign field value
     form.setFieldsValue({
       product: value,
       sellingPrice: selected ? selected.sellingPrice : 0,
       productId: selected ? selected.id : -1,
+      unitLevel: selected ? unitList : null,
     });
 
     // update FormData
@@ -138,6 +149,7 @@ export default function CustomerOrderEdit() {
       [fieldName]: value,
       sellingPrice: selected ? selected.sellingPrice : 0,
       productId: selected ? selected.id : -1,
+      unitLevel: selected ? unitList : null,
     }));
   };
 
@@ -274,14 +286,48 @@ export default function CustomerOrderEdit() {
                   />
                 </div>
 
-                <div className="flex flex-row items-center">
-                  <label className="w-32">Quantity: </label>
-                  <Input
-                    name="quantity"
-                    value={formData.quantity}
-                    onChange={handleChange}
-                    style={{ flex: 1 }}
-                  />
+                <div className="flex flex-row items-center space-x-2">
+                  
+                    <label>Quantity:</label>
+                    <Input
+                      name="quantity"
+                      value={formData.quantity}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          quantity: e.target.value,
+                        }))
+                      }
+                      style={{ flex: 1 }}
+                    />
+              
+
+                  <div>
+                    <label>Select</label>
+                    <Select
+                      name="unitLevel"
+                      allowClear
+                      style={{ flex: 1 }}
+                      placeholder="Select Unit"
+                      showSearch
+                      optionFilterProp="children"
+                      loading={loading}
+                      notFoundContent={
+                        loading ? <Spin size="small" /> : "No unit found"
+                      }
+                      value={formData.unitLevel} // selected unit
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, unitLevel: value }))
+                      }
+                    >
+                      {availableUnits.map((unit) => (
+                        <Select.Option key={unit} value={unit}>
+                          {/* {unit} */}
+                          unit
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </div>
                 </div>
 
                 {/* Submit Button */}
