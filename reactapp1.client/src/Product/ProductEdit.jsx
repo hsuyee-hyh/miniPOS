@@ -34,8 +34,14 @@ export default function ProductEdit() {
       })
       .then((data) => {
         console.log("product edit from api: ", data);
-        setFoundProduct(data);
-        setFormData(data); // preload formData with API data
+        if (data.success) {
+          setFoundProduct(data.product.product);
+          setFormData(data.product.product); // preload formData with API data
+        }
+
+        if (data.error) {
+          setErrorMsg(data.error);
+        }
       })
       .catch((error) => {
         setErrorMsg(error.message);
@@ -43,15 +49,14 @@ export default function ProductEdit() {
       });
   }, [productId]);
 
-
   useEffect(() => {
-    if(errorMsg){
-        const timer = setTimeout(() => {
-            setErrorMsg("");
-        }, 3000);
-        return () => clearTimeout(timer);
+    if (errorMsg) {
+      const timer = setTimeout(() => {
+        setErrorMsg("");
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-  })
+  });
 
   // Handle input changes
   const handleChange = (e) => {
@@ -72,7 +77,7 @@ export default function ProductEdit() {
 
   // Optional: handle form submit
   const handleSubmit = async () => {
-    console.log("Submit formData: ", formData);
+    // console.log("Submit formData: ", formData);
     try {
       const form = new FormData();
 
@@ -224,7 +229,7 @@ export default function ProductEdit() {
                     <Select
                       defaultValue="-- Please select owner --"
                       value={formData.productOwner}
-                      style={{flex: 1 }}
+                      style={{ flex: 1 }}
                       onChange={(value) =>
                         handleAntdDataChange(value, "productOwner")
                       }

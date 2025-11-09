@@ -16,8 +16,8 @@ namespace ReactApp1.Server.Models
         [Required]
         public string Category { get; set; }
 
-        [Required]
-        public string Lvl1Unit { get; set; }
+       
+        public string? Lvl1Unit { get; set; }
         [Required]
         public int StockLvl1 { get; set; }
         [Required]
@@ -32,6 +32,8 @@ namespace ReactApp1.Server.Models
         public int? StockLvl2 { get; set; }
         public decimal? Lvl2BuyingPrice { get; set; }
         public int? Lvl2SellingPrice { get; set; }
+        
+
 
         public int? NumberOfUnit3 { get; set; }
 
@@ -40,6 +42,7 @@ namespace ReactApp1.Server.Models
         public int? StockLvl3 { get; set; }
         public decimal? Lvl3BuyingPrice { get; set; }
         public int? Lvl3SellingPrice { get; set; }
+        
 
 
         public IFormFile? ImgUrl {  get; set; }

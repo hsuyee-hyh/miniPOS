@@ -23,6 +23,7 @@ export default function ProductCreation() {
     stockLvl2: -1,
     lvl2BuyingPrice: 0,
     lvl2SellingPrice: 0,
+    // stockLvl2PerUnit1: 0,
 
     numberOfUnit3: -1,
 
@@ -30,6 +31,7 @@ export default function ProductCreation() {
     stockLvl3: -1,
     lvl3BuyingPrice: 0,
     lvl3SellingPrice: 0,
+    // stockLvl3PerUnit2: 0,
 
     imgUrl: "",
     productOwner: "",
@@ -91,6 +93,7 @@ export default function ProductCreation() {
       form.append("StockLvl2", formData.stockLvl2);
       form.append("Lvl2BuyingPrice", formData.lvl2BuyingPrice);
       form.append("Lvl2SellingPrice", formData.lvl2SellingPrice);
+      // form.append("StockLvl2PerUnit1", formData.stockLvl2PerUnit1);
 
       form.append("NumberOfUnit2", formData.numberOfUnit2);
 
@@ -98,6 +101,7 @@ export default function ProductCreation() {
       form.append("StockLvl3", formData.stockLvl3);
       form.append("Lvl3BuyingPrice", formData.lvl3BuyingPrice);
       form.append("Lvl3SellingPrice", formData.lvl3SellingPrice);
+      // form.append("StockLvl3PerUnit2", formData.stockLvl3PerUnit2);
 
       form.append("ProductOwner", formData.productOwner);
 
