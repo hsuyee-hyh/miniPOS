@@ -51,7 +51,7 @@ namespace ReactApp1.Server.Database.Migrations
                     b.HasIndex("CustomerCode")
                         .IsUnique();
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("ReactApp1.Server.Database.Models.Invoice", b =>
@@ -96,7 +96,7 @@ namespace ReactApp1.Server.Database.Migrations
                         .IsUnique()
                         .HasFilter("[OrderItemId] IS NOT NULL");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", (string)null);
                 });
 
             modelBuilder.Entity("ReactApp1.Server.Database.Models.Order", b =>
@@ -153,7 +153,7 @@ namespace ReactApp1.Server.Database.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("ReactApp1.Server.Database.Models.OrderItem", b =>
@@ -205,7 +205,7 @@ namespace ReactApp1.Server.Database.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("ReactApp1.Server.Database.Models.Product", b =>
@@ -293,7 +293,7 @@ namespace ReactApp1.Server.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("ReactApp1.Server.Database.Models.User", b =>
@@ -324,7 +324,7 @@ namespace ReactApp1.Server.Database.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ReactApp1.Server.Database.Models.Invoice", b =>

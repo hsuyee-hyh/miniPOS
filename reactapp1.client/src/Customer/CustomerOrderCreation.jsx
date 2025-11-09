@@ -187,7 +187,7 @@ export default function CustomerOrderCreation() {
         unitLevel: formData.unitLevel,
         customerId: customerId,
       };
-      console.log("formData from submit is : ", requestOrder);
+      // console.log("formData from submit is : ", requestOrder);
 
       fetch(`https://localhost:7299/api/order/create-order`, {
         method: "POST",
@@ -201,11 +201,15 @@ export default function CustomerOrderCreation() {
           if (!response.ok) {
             message.error("Failed to create the order");
           }
-          response.json();
+          return response.json();
         })
         .then((data) => {
-          console.log(data);
-          navigate(`/customer/${customerId}`);
+          console.log("created order is ", data);
+          if (data.success) {
+            navigate(`/customer/${customerId}`);
+          } else if (data.error) {
+            setErrorMsg(data.error);
+          }
         });
     } catch (err) {
       setErrorMsg("Failed to create the order with ", err.message);
@@ -214,9 +218,11 @@ export default function CustomerOrderCreation() {
   return (
     <>
       <Navbar />
+      {errorMsg && <Alert message={errorMsg} type="error" className="m-10" />}
       <div className="flex flex-col items-center my-7">
+        
         <h1 className="text-xl font-bold mb-4">Create an Order</h1>
-        {errorMsg && <Alert message={errorMsg} type="error" className="mb-5" />}
+        
 
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <div className="flex flex-col space-y-3 w-44 md:w-96">

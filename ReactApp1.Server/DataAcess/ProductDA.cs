@@ -2,6 +2,7 @@
 using ReactApp1.Server.Database;
 using ReactApp1.Server.Database.Models;
 using ReactApp1.Server.Models;
+using ReactApp1.Server.ResponseModels;
 using System.Threading.Tasks;
 
 namespace ReactApp1.Server.DataAcess
@@ -40,6 +41,23 @@ namespace ReactApp1.Server.DataAcess
             }
 
             return units;
+        }
+
+        public ProductResponseModel GetProductDetailAsync(int productId)
+        {
+            var product = _context.Products
+                .FirstOrDefault(p => p.Id == productId);
+            if(product is null)
+            {
+                return new ProductResponseModel
+                {
+                    product = null,
+                };
+            }
+            return new ProductResponseModel
+            {
+                product = product,
+            };
         }
         public async Task<int> createProductAsync(ProductCreateRequestDto productRequestData)
         {
@@ -93,6 +111,7 @@ namespace ReactApp1.Server.DataAcess
                 Lvl2Unit = productRequestData.Lvl2Unit ?? "",
                 StockLvl2 = productRequestData.StockLvl2 ?? -1,
                 Lvl2SellingPrice = productRequestData.Lvl2SellingPrice ?? 0,
+                
 
                 NumberOfUnit3 = productRequestData.NumberOfUnit3 ?? -1,
 

@@ -113,44 +113,82 @@ namespace ReactApp1.Server.DataAcess
                     };
                 }
 
-                // create invoice
-                var invoice = new Invoice
+                // orderItem
+                var orderItem = await _context.OrderItems
+                    .FirstOrDefaultAsync(x => x.Id == i.OrderItemId);
+
+                // product
+                var product = await _context.Products
+                    .FirstOrDefaultAsync(x => x.Id == orderItem.ProductId);
+
+                // check unit level 
+                // decrease stock
+                if(orderItem.UnitLevel == product.Lvl1Unit && product.StockLvl1 > 0 && product.StockLvl2 > 0)
                 {
-                    InvoiceId = i.InvoiceId,
-                    TotalBalance = i.TotalBalance,
-                    PaidAmount = i.PaidAmount,
-                    RemainingBalance = i.RemainingBalance,
-                    CreatedDate = DateTime.UtcNow,
-                    CreatedBy = "Admin",
-                    CustomerId = i.CustomerId,
-                    OrderItemId = i.OrderItemId,
-                    
-                };
+                    product.StockLvl1 = product.StockLvl1 - orderItem.Quantity;
+                    if(product.StockLvl2 > 0)
+                    {
+                        product.StockLvl2 = product.StockLvl2 - product.NumberOfUnit2;
+                    }
+                }else if(orderItem.UnitLevel == product.Lvl2Unit && product.StockLvl2 > 0 && product.StockLvl1 > 0)
+                {
+                    product.StockLvl2 = product.StockLvl2 - orderItem.Quantity;
+                    if (product.StockLvl2 == 0)
+                    {
+                        product.StockLvl1 = product.StockLvl1 - 1;
+                    }
+
+                    //if(orderItem.Quantity == product.NumberOfUnit2)
+                    //{
+
+
+                    //}
+                    //else
+                    //{
+                    //    product.StockLvl2 = product.StockLvl2 - orderItem.Quantity;
+                    //}
+                }
+
+                    // create invoice
+                    var invoice = new Invoice
+                    {
+                        InvoiceId = i.InvoiceId,
+                        TotalBalance = i.TotalBalance,
+                        PaidAmount = i.PaidAmount,
+                        RemainingBalance = i.RemainingBalance,
+                        CreatedDate = DateTime.UtcNow,
+                        CreatedBy = "Admin",
+                        CustomerId = i.CustomerId,
+                        OrderItemId = i.OrderItemId,
+
+                    };
                 await _context.AddAsync(invoice);
                 var result = await _context.SaveChangesAsync();
 
                 // Get the OrderItem related to this invoice
-                var orderItem = await _context.OrderItems
-                    .FirstOrDefaultAsync(oi => oi.Id == i.OrderItemId);
-                if (orderItem is null)
-                {
-                    throw new Exception("OrderItem not found to mark as invoice generated.");
-                }
-                // Update the flag
+                //var orderItem = await _context.OrderItems
+                //    .FirstOrDefaultAsync(oi => oi.Id == i.OrderItemId);
+                //if (orderItem is null)
+                //{
+                //    throw new Exception("OrderItem not found to mark as invoice generated.");
+                //}
+
+                // Update orderItem's IsGeneratedInvoice the flag
                 orderItem.IsGeneratedInvoice = true;
+
                 // find product and decrease product stock
-                var product = await _context.Products
-                    .FirstOrDefaultAsync(x => x.Id == orderItem.ProductId);
-                if(orderItem.UnitLevel == product.Lvl1Unit)
-                {
-                    product.StockLvl1 = product.StockLvl1 - 1;
-                }else if(orderItem.UnitLevel == product.Lvl2Unit)
-                {
-                    product.StockLvl2 = product.StockLvl2 - 1;
-                }else if(orderItem.UnitLevel == product.Lvl3Unit)
-                {
-                    product.StockLvl3 = product.StockLvl3 - 1;
-                }
+                //var product = await _context.Products
+                //    .FirstOrDefaultAsync(x => x.Id == orderItem.ProductId);
+                //if(orderItem.UnitLevel == product.Lvl1Unit)
+                //{
+                //    product.StockLvl1 = product.StockLvl1 - 1;
+                //}else if(orderItem.UnitLevel == product.Lvl2Unit)
+                //{
+                //    product.StockLvl2 = product.StockLvl2 - 1;
+                //}else if(orderItem.UnitLevel == product.Lvl3Unit)
+                //{
+                //    product.StockLvl3 = product.StockLvl3 - 1;
+                //}
 
                 // define order.IsGeneratedInvoice true
                 var order = await _context.Orders

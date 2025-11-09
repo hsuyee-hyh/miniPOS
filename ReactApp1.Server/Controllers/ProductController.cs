@@ -5,6 +5,7 @@ using ReactApp1.Server.DataAcess;
 using ReactApp1.Server.Database;
 using ReactApp1.Server.Database.Models;
 using ReactApp1.Server.Models;
+using ReactApp1.Server.ResponseModels;
 using ReactApp1.Server.Services;
 using System.ComponentModel;
 using System.Data.Common;
@@ -36,6 +37,26 @@ namespace ReactApp1.Server.Controllers
         {
            List<Product> result =  await _context.Products.OrderByDescending(x => x.Id).ToListAsync();
             return Ok(result);
+        }
+
+        [HttpGet("{productId}")]
+        public IActionResult GetProductDetail(int productId)
+        {
+            _productService.checkProductId(productId);
+            ProductResponseModel foundProduct = _productDA.GetProductDetailAsync(productId);
+            if(foundProduct.product == null)
+            {
+                return NotFound(new
+                {
+                    error = $"Product is not found with that id, {productId}"
+                });
+            }
+            return Ok(new
+            {
+                success = "Product is found.",
+                product = foundProduct,
+            });
+            
         }
 
         [HttpGet("{productId}/units")]

@@ -74,36 +74,68 @@ namespace ReactApp1.Server.Controllers
                 .FirstOrDefaultAsync(x => x.Id == requestOrder.CustomerId);
 
             // product
-            //var product = await _context.Products
-            //    .FirstOrDefaultAsync(x => x.Id == requestOrder.ProductId);
-
-            var order = new Order
+            var product = await _context.Products
+                .FirstOrDefaultAsync(x => x.Id == requestOrder.ProductId);
+            // check stock
+            if(requestOrder.UnitLevel == product.Lvl1Unit)
             {
-                Product = requestOrder.Product,
-                SellingPrice = requestOrder.SellingPrice,
-                ProductId = requestOrder.ProductId,
+                if(product.StockLvl1 <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        error = "Not enough stock level"
+                    });
+                }
+            }else if(requestOrder.UnitLevel == product.Lvl2Unit)
+            {
+                if(product.StockLvl2 <= 0 && product.StockLvl1 <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        error = "Not enough stock level"
+                    });
+                }
+            }else if(requestOrder.UnitLevel == product.Lvl3Unit)
+            {
+                if(product.StockLvl3 <= 0 && product.StockLvl3 <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        error = "Not enough stock level"
+                    });
+                }
+            }
 
-                AdditionalSellingPrice = requestOrder.AdditionalSellingPrice,
-                LabourCost = requestOrder.LabourCost,
-                VehicleCost = requestOrder.VehicleCost,
-                TotalSellingCost = requestOrder.TotalSellingCost,
-                Quantity = requestOrder.Quantity,
-                UnitLevel = requestOrder.UnitLevel,
-                CreatedDate = DateTimeOffset.Now,
-                CreatedBy = "Admin",
-                IsGeneratedInvoice = false,
+                var order = new Order
+                {
+                    Product = requestOrder.Product,
+                    SellingPrice = requestOrder.SellingPrice,
+                    ProductId = requestOrder.ProductId,
 
-                CustomerId = requestOrder.CustomerId,
-                Customer = customer,
-            };
+                    AdditionalSellingPrice = requestOrder.AdditionalSellingPrice,
+                    LabourCost = requestOrder.LabourCost,
+                    VehicleCost = requestOrder.VehicleCost,
+                    TotalSellingCost = requestOrder.TotalSellingCost,
+                    Quantity = requestOrder.Quantity,
+                    UnitLevel = requestOrder.UnitLevel,
+                    CreatedDate = DateTimeOffset.Now,
+                    CreatedBy = "Admin",
+                    IsGeneratedInvoice = false,
+
+                    CustomerId = requestOrder.CustomerId,
+                    Customer = customer,
+                };
             var createdOrder = await _context.Orders.AddAsync(order);
             var result = await _context.SaveChangesAsync();
 
             if (result < 1)
             {
-                return BadRequest("Failed to create the order");
+                return BadRequest(new
+                {
+                    error = "Failed to create the order",
+                });
             }
-            return Ok(new { message = "Order is successfully created" });
+            return Ok(new { success = "Order is successfully created" });
         }
 
      

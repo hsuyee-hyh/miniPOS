@@ -5,7 +5,7 @@ import { PageContainer } from "@ant-design/pro-components";
 import { useNavigate } from "react-router-dom";
 
 export default function ProductList() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [Products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,9 +56,19 @@ export default function ProductList() {
       key: "sellingPrice",
     },
     {
-      title: "InStock",
+      title: "InStock Lvl 1",
       dataIndex: "stockLvl1",
       key: "stockLvl1",
+    },
+    {
+      title: "InStock Lvl 2",
+      dataIndex: "stockLvl2",
+      key: "stockLvl2",
+    },
+    {
+      title: "InStock Lvl 3",
+      dataIndex: "stockLvl3",
+      key: "stockLvl3",
     },
     {
       title: "Actions",
@@ -66,7 +76,12 @@ export default function ProductList() {
       key: "actions",
       render: (_, record) => (
         <div className="flex space-x-4">
-          <Button type="primary" onClick={() => navigate(`/product/${record.id}`)}>Detail</Button>
+          <Button
+            type="primary"
+            onClick={() => navigate(`/product/${record.id}`)}
+          >
+            Detail
+          </Button>
         </div>
       ),
     },
@@ -75,8 +90,7 @@ export default function ProductList() {
   if (loading) {
     return (
       <div className="h-screen flex justify-center items-center m-10">
-        <Spin tip="Loading...">
-        </Spin>
+        <Spin tip="Loading..."></Spin>
       </div>
     );
   }

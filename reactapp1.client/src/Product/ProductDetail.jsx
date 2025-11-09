@@ -23,7 +23,12 @@ export default function ProductDetail() {
       })
       .then((data) => {
         // console.log("product details from api: ", data);
-        setFoundProduct(data);
+        if(data.success){
+          setFoundProduct(data.product.product);
+        }else if (data.error){
+          setErrorMsg(data.error);
+        }
+        
       })
       .catch((error) => {
         setErrorMsg(error.message);
@@ -55,7 +60,7 @@ export default function ProductDetail() {
         }
         return response.json();
       })
-      .then((data) => {})
+      .then((data) => {console.log("product data is ", data)})
       .catch((error) => {
         setErrorMsg(error.message);
         message.error("Error fetching the product details: ", error.message);
